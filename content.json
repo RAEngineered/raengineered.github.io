@@ -97,7 +97,7 @@
         "Human approval gate between raster generation and vectorisation",
         "Emboss-mesh aware output for 3D print workflows"
       ],
-      "repo": "https://github.com/RAEngineered/lineart-svg",
+      "repo": "https://github.com/RAEngineered/agent-skills/tree/main/skills/lineart-svg",
       "visibility": "public",
       "publish": true
     },

@@ -10,7 +10,7 @@ Vehicle systems, CAN/HIL test, and the tooling around them. I build the automati
 
 ### Design & Fabrication
 
-- **[lineart-svg](https://github.com/RAEngineered/lineart-svg)** — Photo to single-colour SVG pipeline with a checkpointed review loop, output constrained to be Bambu Studio importable.
+- **[lineart-svg](https://github.com/RAEngineered/agent-skills/tree/main/skills/lineart-svg)** — Photo to single-colour SVG pipeline with a checkpointed review loop, output constrained to be Bambu Studio importable.
 
 ### Systems & Storage
 
