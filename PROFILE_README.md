@@ -6,7 +6,7 @@ Vehicle systems, CAN/HIL test, and the tooling around them. I build the automati
 
 ### Agent Harness
 
-- **[agent-skills](https://github.com/RAEngineered/agent-skills)** — 34 shipped Claude Code skills covering orchestration, token efficiency, observability, and document pipelines.
+- **[agent-skills](https://github.com/RAEngineered/agent-skills)** — 13 Claude Code skills I wrote: document and scan pipelines, machine-inventory generators, session cost telemetry, and a delegating orchestrator.
 
 ### Design & Fabrication
 

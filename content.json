@@ -67,16 +67,16 @@
       "title": "agent-skills",
       "area": "AGENT",
       "year": "2026",
-      "blurb": "34 shipped Claude Code skills covering orchestration, token efficiency, observability, and document pipelines.",
+      "blurb": "13 Claude Code skills I wrote: document and scan pipelines, machine-inventory generators, session cost telemetry, and a delegating orchestrator.",
       "stack": [
         "Python",
         "Bash",
         "YAML"
       ],
       "highlights": [
-        "Measured 65% output-token reduction across a 9-skill compression family",
-        "Multi-agent orchestrator with explicit human approval gates",
-        "Cost and cache-hit dashboards over local session telemetry"
+        "Scan pipeline that OCRs, classifies and renames documents with a never-delete staging gate",
+        "Cost and cache-hit dashboards built over local session telemetry",
+        "Multi-agent orchestrator with explicit human approval gates"
       ],
       "repo": "https://github.com/RAEngineered/agent-skills",
       "visibility": "public",
