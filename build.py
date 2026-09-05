@@ -98,13 +98,14 @@ def render_html(data):
 <style>
 :root {{
   color-scheme: light dark;
-  /* Brand palette - burgundy. Source: brand/README.md colour table. */
-  --bg:#faf7f7; --fg:#1a1214; --muted:#6f6165; --line:#e7dcde;
-  --card:#ffffff; --accent:#5A1322; --gold:#9a7420; --rule:#5A1322;
+  /* Brand palette. Accent is the avatar red #5A1322 darkened; neutrals are
+     kept neutral so nothing reads pink. */
+  --bg:#fbfaf9; --fg:#171414; --muted:#68635f; --line:#e2dedb;
+  --card:#ffffff; --accent:#45101B; --gold:#8a6718; --rule:#45101B;
 }}
 @media (prefers-color-scheme: dark) {{
-  :root {{ --bg:#140F11; --fg:#F4EFEE; --muted:#a3919a; --line:#33232a;
-           --card:#1E1519; --accent:#C79AA4; --gold:#C9A24A; --rule:#8d2338; }}
+  :root {{ --bg:#120F10; --fg:#F4EFEE; --muted:#98918e; --line:#2b2527;
+           --card:#1A1517; --accent:#C9A24A; --gold:#C9A24A; --rule:#5A1322; }}
 }}
 * {{ box-sizing:border-box; }}
 body {{
