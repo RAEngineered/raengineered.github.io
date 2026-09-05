@@ -1,0 +1,161 @@
+{
+  "profile": {
+    "name": "Rae",
+    "handle": "RAEngineered",
+    "tagline": "Automotive & embedded systems engineer",
+    "location": "Los Angeles, CA",
+    "blurb": "Vehicle systems, CAN/HIL test, and the tooling around them. I build the automation that makes the engineering work repeatable.",
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/RAEngineered"
+      }
+    ]
+  },
+  "areas": {
+    "AGENT": {
+      "name": "Agent Harness",
+      "blurb": "Tooling that makes AI-assisted engineering reproducible."
+    },
+    "AIINF": {
+      "name": "Local AI Infra",
+      "blurb": "Self-hosted model runtimes and serving."
+    },
+    "MAKE": {
+      "name": "Design & Fabrication",
+      "blurb": "Parametric CAD, vector pipelines, 3D print automation."
+    },
+    "SYSOPS": {
+      "name": "Systems & Storage",
+      "blurb": "Machine fleet, sync, and document pipelines."
+    },
+    "AUTO": {
+      "name": "Automotive",
+      "blurb": "CAN, vehicle signals, HIL."
+    },
+    "MBD": {
+      "name": "Model-Based Design",
+      "blurb": "V-model development, MiL/PiL/HiL, code generation."
+    }
+  },
+  "projects": [
+    {
+      "id": "thesis-concept-car",
+      "title": "V-Model Thesis — Concept Car",
+      "area": "MBD",
+      "year": "2026",
+      "blurb": "Model-based development of an autonomous scale vehicle, taken through the full V from requirements to generated embedded C, with the right arm of the V expressed as real CI jobs.",
+      "stack": [
+        "C",
+        "Simulink",
+        "MATLAB Coder",
+        "Jenkins",
+        "GitLab CI",
+        "GitHub Actions"
+      ],
+      "highlights": [
+        "24 figures extracted from the thesis with captions verified by bbox position",
+        "Every V right-arm verification stage mapped to a named CI job",
+        "3x3 Kp/Ki sweep on a hil-nano33 Jenkins agent replacing manual trials"
+      ],
+      "repo": null,
+      "visibility": "private",
+      "publish": false
+    },
+    {
+      "id": "agent-skills",
+      "title": "agent-skills",
+      "area": "AGENT",
+      "year": "2026",
+      "blurb": "34 shipped Claude Code skills covering orchestration, token efficiency, observability, and document pipelines.",
+      "stack": [
+        "Python",
+        "Bash",
+        "YAML"
+      ],
+      "highlights": [
+        "Measured 65% output-token reduction across a 9-skill compression family",
+        "Multi-agent orchestrator with explicit human approval gates",
+        "Cost and cache-hit dashboards over local session telemetry"
+      ],
+      "repo": "https://github.com/RAEngineered/agent-skills",
+      "visibility": "public",
+      "publish": true
+    },
+    {
+      "id": "lineart-svg",
+      "title": "lineart-svg",
+      "area": "MAKE",
+      "year": "2026",
+      "blurb": "Photo to single-colour SVG pipeline with a checkpointed review loop, output constrained to be Bambu Studio importable.",
+      "stack": [
+        "Python",
+        "SVG",
+        "Pillow"
+      ],
+      "highlights": [
+        "Human approval gate between raster generation and vectorisation",
+        "Emboss-mesh aware output for 3D print workflows"
+      ],
+      "repo": "https://github.com/RAEngineered/lineart-svg",
+      "visibility": "public",
+      "publish": true
+    },
+    {
+      "id": "scan-pipeline",
+      "title": "Document scan pipeline",
+      "area": "SYSOPS",
+      "year": "2026",
+      "blurb": "Batch pipeline that separates, deskews, OCRs, classifies and renames scanned engineering records, writing structured metadata back to the filesystem.",
+      "stack": [
+        "Python",
+        "OCR",
+        "Windows"
+      ],
+      "highlights": [
+        "Recovered true document dates after a drive migration destroyed file mtimes",
+        "Never-delete policy with a staged review directory"
+      ],
+      "repo": null,
+      "visibility": "private",
+      "publish": true
+    },
+    {
+      "id": "tower-trackstack",
+      "title": "Tower-TrackStack",
+      "area": "SYSOPS",
+      "year": "2026",
+      "blurb": "Passive daily engineering log. Aggregates session, git and shell activity into a committed markdown record.",
+      "stack": [
+        "Python",
+        "GitHub Actions"
+      ],
+      "highlights": [
+        "Zero-effort capture — runs on a schedule, commits itself"
+      ],
+      "repo": null,
+      "visibility": "private",
+      "publish": true
+    },
+    {
+      "id": "cansig",
+      "title": "cansig",
+      "area": "AUTO",
+      "year": "2026",
+      "blurb": "DBC-driven CAN frame decoding — C library plus a C++20 CLI. Planned.",
+      "stack": [
+        "C",
+        "C++20",
+        "CMake",
+        "GoogleTest"
+      ],
+      "highlights": [
+        "gcc / clang / MSVC matrix, ASan + UBSan, gcovr coverage gate",
+        "Same build expressed as GitHub Actions, GitLab CI and a declarative Jenkinsfile"
+      ],
+      "repo": null,
+      "visibility": "planned",
+      "publish": false
+    }
+  ]
+}

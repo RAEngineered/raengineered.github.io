@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rae — Automotive &amp; embedded systems engineer</title>
+<meta name="description" content="Vehicle systems, CAN/HIL test, and the tooling around them. I build the automation that makes the engineering work repeatable.">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg:#fbfbfa; --fg:#1a1a19; --muted:#6b6b66; --line:#e3e3df;
+  --card:#ffffff; --accent:#8a4b2a;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#151514; --fg:#eceae5; --muted:#9a9a92; --line:#2c2c29;
+           --card:#1d1d1b; --accent:#d99a6c; }
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; background:var(--bg); color:var(--fg);
+  font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+.wrap { max-width:56rem; margin:0 auto; padding:4rem 1.25rem 6rem; }
+h1 { font-size:clamp(2rem,5vw,2.75rem); line-height:1.15; margin:0 0 .35rem; letter-spacing:-.02em; }
+.tagline { color:var(--accent); font-weight:600; margin:0 0 .25rem; }
+.loc { color:var(--muted); margin:0 0 1.25rem; font-size:.9rem; }
+.lede { font-size:1.1rem; max-width:42rem; margin:0 0 1.5rem; }
+.links a { color:var(--fg); }
+hr { border:0; border-top:1px solid var(--line); margin:3rem 0; }
+.area-head h2 { font-size:1.35rem; margin:0 0 .2rem; letter-spacing:-.01em; }
+.area-head p { color:var(--muted); margin:0 0 1.25rem; font-size:.95rem; }
+.area { margin-bottom:3rem; }
+.grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(19rem,1fr)); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:.75rem; padding:1.25rem; }
+.card h3 { margin:0 0 .5rem; font-size:1.05rem; }
+.card h3 a { color:var(--fg); }
+.card p { margin:0 0 .75rem; color:var(--fg); }
+.vis { font-size:.7rem; font-weight:500; text-transform:uppercase; letter-spacing:.04em;
+        color:var(--muted); border:1px solid var(--line); border-radius:1rem;
+        padding:.1rem .5rem; white-space:nowrap; vertical-align:.15em; }
+.vis-public { color:var(--accent); border-color:var(--accent); }
+ul.hi { margin:0 0 .9rem; padding-left:1.1rem; font-size:.92rem; color:var(--muted); }
+ul.hi li { margin:.2rem 0; }
+ul.stack { list-style:none; display:flex; flex-wrap:wrap; gap:.4rem; margin:0; padding:0; }
+ul.stack li { font-size:.75rem; color:var(--muted); border:1px solid var(--line);
+               border-radius:.35rem; padding:.1rem .45rem; }
+footer { color:var(--muted); font-size:.85rem; border-top:1px solid var(--line); padding-top:1.5rem; }
+a { text-decoration-thickness:1px; text-underline-offset:2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Rae</h1>
+    <p class="tagline">Automotive &amp; embedded systems engineer</p>
+    <p class="loc">Los Angeles, CA</p>
+    <p class="lede">Vehicle systems, CAN/HIL test, and the tooling around them. I build the automation that makes the engineering work repeatable.</p>
+    <p class="links"><a href="https://github.com/RAEngineered">GitHub</a></p>
+  </header>
+  <hr>
+  <main>
+      <section class="area">
+        <header class="area-head">
+          <h2>Agent Harness</h2>
+          <p>Tooling that makes AI-assisted engineering reproducible.</p>
+        </header>
+        <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/RAEngineered/agent-skills">agent-skills</a> <span class="vis vis-public">public repo</span></h3>
+          <p>34 shipped Claude Code skills covering orchestration, token efficiency, observability, and document pipelines.</p>
+          <ul class="hi"><li>Measured 65% output-token reduction across a 9-skill compression family</li><li>Multi-agent orchestrator with explicit human approval gates</li><li>Cost and cache-hit dashboards over local session telemetry</li></ul>
+          <ul class="stack"><li>Python</li><li>Bash</li><li>YAML</li></ul>
+        </article></div>
+      </section>
+      <section class="area">
+        <header class="area-head">
+          <h2>Design &amp; Fabrication</h2>
+          <p>Parametric CAD, vector pipelines, 3D print automation.</p>
+        </header>
+        <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/RAEngineered/lineart-svg">lineart-svg</a> <span class="vis vis-public">public repo</span></h3>
+          <p>Photo to single-colour SVG pipeline with a checkpointed review loop, output constrained to be Bambu Studio importable.</p>
+          <ul class="hi"><li>Human approval gate between raster generation and vectorisation</li><li>Emboss-mesh aware output for 3D print workflows</li></ul>
+          <ul class="stack"><li>Python</li><li>SVG</li><li>Pillow</li></ul>
+        </article></div>
+      </section>
+      <section class="area">
+        <header class="area-head">
+          <h2>Systems &amp; Storage</h2>
+          <p>Machine fleet, sync, and document pipelines.</p>
+        </header>
+        <div class="grid">
+        <article class="card">
+          <h3>Document scan pipeline <span class="vis vis-private">private repo</span></h3>
+          <p>Batch pipeline that separates, deskews, OCRs, classifies and renames scanned engineering records, writing structured metadata back to the filesystem.</p>
+          <ul class="hi"><li>Recovered true document dates after a drive migration destroyed file mtimes</li><li>Never-delete policy with a staged review directory</li></ul>
+          <ul class="stack"><li>Python</li><li>OCR</li><li>Windows</li></ul>
+        </article>
+        <article class="card">
+          <h3>Tower-TrackStack <span class="vis vis-private">private repo</span></h3>
+          <p>Passive daily engineering log. Aggregates session, git and shell activity into a committed markdown record.</p>
+          <ul class="hi"><li>Zero-effort capture — runs on a schedule, commits itself</li></ul>
+          <ul class="stack"><li>Python</li><li>GitHub Actions</li></ul>
+        </article></div>
+      </section></main>
+  <footer>
+    <p>Generated 2026-09-05 from <code>content.json</code>. Private repositories are described but not linked.</p>
+  </footer>
+</div>
+</body>
+</html>
