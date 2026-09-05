@@ -93,29 +93,36 @@ def render_html(data):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(prof["name"])} — {e(prof["tagline"])}</title>
 <meta name="description" content="{e(prof["blurb"])}">
+<link rel="icon" href="assets/avatar.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/avatar.png">
 <style>
 :root {{
   color-scheme: light dark;
-  --bg:#fbfbfa; --fg:#1a1a19; --muted:#6b6b66; --line:#e3e3df;
-  --card:#ffffff; --accent:#8a4b2a;
+  /* Brand palette - burgundy. Source: brand/README.md colour table. */
+  --bg:#faf7f7; --fg:#1a1214; --muted:#6f6165; --line:#e7dcde;
+  --card:#ffffff; --accent:#5A1322; --gold:#9a7420; --rule:#5A1322;
 }}
 @media (prefers-color-scheme: dark) {{
-  :root {{ --bg:#151514; --fg:#eceae5; --muted:#9a9a92; --line:#2c2c29;
-           --card:#1d1d1b; --accent:#d99a6c; }}
+  :root {{ --bg:#140F11; --fg:#F4EFEE; --muted:#a3919a; --line:#33232a;
+           --card:#1E1519; --accent:#C79AA4; --gold:#C9A24A; --rule:#8d2338; }}
 }}
 * {{ box-sizing:border-box; }}
 body {{
   margin:0; background:var(--bg); color:var(--fg);
+  border-top:4px solid var(--rule);
   font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }}
 .wrap {{ max-width:56rem; margin:0 auto; padding:4rem 1.25rem 6rem; }}
 h1 {{ font-size:clamp(2rem,5vw,2.75rem); line-height:1.15; margin:0 0 .35rem; letter-spacing:-.02em; }}
+.avatar {{ width:72px; height:72px; border-radius:.75rem; display:block; margin:0 0 1rem; }}
+h1::after {{ content:""; display:block; width:2.5rem; height:3px; background:var(--gold);
+             border-radius:2px; margin:.6rem 0 .1rem; }}
 .tagline {{ color:var(--accent); font-weight:600; margin:0 0 .25rem; }}
 .loc {{ color:var(--muted); margin:0 0 1.25rem; font-size:.9rem; }}
 .lede {{ font-size:1.1rem; max-width:42rem; margin:0 0 1.5rem; }}
 .links a {{ color:var(--fg); }}
 hr {{ border:0; border-top:1px solid var(--line); margin:3rem 0; }}
-.area-head h2 {{ font-size:1.35rem; margin:0 0 .2rem; letter-spacing:-.01em; }}
+.area-head h2 {{ font-size:1.35rem; margin:0 0 .2rem; letter-spacing:-.01em; color:var(--accent); }}
 .area-head p {{ color:var(--muted); margin:0 0 1.25rem; font-size:.95rem; }}
 .area {{ margin-bottom:3rem; }}
 .grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(19rem,1fr)); }}
@@ -139,6 +146,7 @@ a {{ text-decoration-thickness:1px; text-underline-offset:2px; }}
 <body>
 <div class="wrap">
   <header>
+    <img class="avatar" src="assets/avatar.png" alt="" width="72" height="72">
     <h1>{e(prof["name"])}</h1>
     <p class="tagline">{e(prof["tagline"])}</p>
     <p class="loc">{e(prof["location"])}</p>
