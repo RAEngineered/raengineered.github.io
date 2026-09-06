@@ -40,23 +40,23 @@
   },
   "projects": [
     {
-      "id": "thesis-concept-car",
-      "title": "V-Model Thesis — Concept Car",
+      "id": "concept-car",
+      "title": "Concept Car — autonomous driving function",
       "area": "MBD",
       "year": "2026",
-      "blurb": "Model-based development of an autonomous scale vehicle, taken through the full V from requirements to generated embedded C, with the right arm of the V expressed as real CI jobs.",
+      "blurb": "Two-wheeled vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21.",
       "stack": [
-        "C",
         "Simulink",
-        "MATLAB Coder",
-        "Jenkins",
-        "GitLab CI",
-        "GitHub Actions"
+        "Stateflow",
+        "MATLAB",
+        "Embedded C",
+        "PID",
+        "Jenkins"
       ],
       "highlights": [
-        "24 figures extracted from the thesis with captions verified by bbox position",
-        "Every V right-arm verification stage mapped to a named CI job",
-        "3x3 Kp/Ki sweep on a hil-nano33 Jenkins agent replacing manual trials"
+        "Motor characterised by measured sweep, dead band included, rather than datasheet values",
+        "Route as a state machine with relative targets, so one four-state cycle closes any polygon",
+        "Verification retrofitted as CI: static analysis plus a requirements traceability gate"
       ],
       "repo": null,
       "visibility": "private",
