@@ -60,7 +60,7 @@
       ],
       "repo": null,
       "visibility": "private",
-      "publish": false
+      "publish": true
     },
     {
       "id": "agent-skills",
@@ -155,7 +155,7 @@
       ],
       "repo": null,
       "visibility": "planned",
-      "publish": false
+      "publish": true
     }
   ]
 }

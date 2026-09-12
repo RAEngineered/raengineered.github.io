@@ -112,9 +112,35 @@ a { text-decoration-thickness:1px; text-underline-offset:2px; }
           <ul class="hi"><li>Zero-effort capture — runs on a schedule, commits itself</li></ul>
           <ul class="stack"><li>Python</li><li>GitHub Actions</li></ul>
         </article></div>
+      </section>
+      <section class="area">
+        <header class="area-head">
+          <h2>Automotive</h2>
+          <p>CAN, vehicle signals, HIL.</p>
+        </header>
+        <div class="grid">
+        <article class="card">
+          <h3>cansig <span class="vis vis-planned">planned</span></h3>
+          <p>DBC-driven CAN frame decoding — C library plus a C++20 CLI. Planned.</p>
+          <ul class="hi"><li>gcc / clang / MSVC matrix, ASan + UBSan, gcovr coverage gate</li><li>Same build expressed as GitHub Actions, GitLab CI and a declarative Jenkinsfile</li></ul>
+          <ul class="stack"><li>C</li><li>C++20</li><li>CMake</li><li>GoogleTest</li></ul>
+        </article></div>
+      </section>
+      <section class="area">
+        <header class="area-head">
+          <h2>Model-Based Design</h2>
+          <p>V-model development, MiL/PiL/HiL, code generation.</p>
+        </header>
+        <div class="grid">
+        <article class="card">
+          <h3>Concept Car — autonomous driving function <span class="vis vis-private">private repo</span></h3>
+          <p>Two-wheeled vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21.</p>
+          <ul class="hi"><li>Motor characterised by measured sweep, dead band included, rather than datasheet values</li><li>Route as a state machine with relative targets, so one four-state cycle closes any polygon</li><li>Verification retrofitted as CI: static analysis plus a requirements traceability gate</li></ul>
+          <ul class="stack"><li>Simulink</li><li>Stateflow</li><li>MATLAB</li><li>Embedded C</li><li>PID</li><li>Jenkins</li></ul>
+        </article></div>
       </section></main>
   <footer>
-    <p>Generated 2026-09-06 from <code>content.json</code>. Private repositories are described but not linked.</p>
+    <p>Generated 2026-09-12 from <code>content.json</code>. Private repositories are described but not linked.</p>
   </footer>
 </div>
 </body>

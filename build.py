@@ -180,7 +180,7 @@ def render_readme(data):
         L.append("")
         for p in items:
             name = f"**[{p['title']}]({p['repo']})**" if p.get("repo") else f"**{p['title']}**"
-            tag = "" if p.get("repo") else " _(private)_"
+            tag = "" if p.get("repo") else f" _({p.get('visibility', 'private')})_"
             L.append(f"- {name}{tag} — {p['blurb']}")
         L.append("")
     L += [
