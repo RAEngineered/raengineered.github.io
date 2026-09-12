@@ -1,0 +1,487 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pipeline at Scale</title>
+<link rel="stylesheet" href="style.css">
+
+<nav class="topnav">
+  <div class="wrap">
+    <a class="back" href="../">&larr; portfolio</a>
+    <span class="brand">concept-car</span>
+    <a href="concept-car.html">Project</a>
+    <a href="index.html">Deep dive</a>
+    <a href="pipeline.html" aria-current="page">Pipeline</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="kicker">Same build · run as CI</p>
+  <h1>The right arm of the V, turned into a build</h1>
+  <p class="standfirst">The verification work was done correctly and by hand, by one person, once. This page is that verification work expressed as continuous integration. Three jobs run today on a Jenkins controller defined entirely as code. The rest of the pipeline described below is designed and not yet built, and is marked that way everywhere it appears.</p>
+  <div class="chips">
+    <span class="chip">Jenkins + JCasC</span>
+    <span class="chip">Docker</span>
+    <span class="chip">cppcheck</span>
+    <span class="chip">Requirement traceability</span>
+  </div>
+  <div class="meta">
+    <span><b>Running today</b> 3 jobs, green</span>
+    <span><b>Traceability</b> 11 of 17 requirements</span>
+    <span><b>Original build</b> unchanged</span>
+  </div>
+</header>
+
+<section>
+  <p class="sec-num">01 — Premise</p>
+  <h2>The process was right. The loop was too slow.</h2>
+  <p class="lede">Nothing on the previous page is wrong engineering. Requirements were written, traced, and verified; the architecture was decomposed before implementation; three test stages ran in the correct order. The failure mode was throughput — 59 tethered trials to build the controller and three untethered runs to validate it, because every iteration was a person changing a constant, rebuilding, reflashing, and walking a track.</p>
+  <p>A team hitting the same wall does not fix it by working harder. It fixes it by making the verification arm of the V run without a human in it, so the human budget goes to the trials that need judgement.</p>
+
+  <div class="callout">
+    <div class="label">Honest scope</div>
+    <p>This is additive work on top of a finished project, not a rewrite and not a claim about what was done originally. Automated results are labelled as automated and kept separate from the original trial data. The commit history reflects when each part was actually built — and the parts that are not built yet say so.</p>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">02 — Built</p>
+  <h2>What actually runs</h2>
+  <p class="lede">A Jenkins controller, in Docker, configured entirely through JCasC — no setup wizard, no clicked configuration. Deleting the volume and running <code>docker compose up</code> reproduces the same server and the same job. Three stages run in parallel on every build.</p>
+
+  <div class="runbox">
+    <div class="runhead">
+      <span>concept-car-verification · build #1</span>
+      <span><b>SUCCESS</b></span>
+    </div>
+<pre>[Verify] parallel branches: Static analysis, Traceability gate, Artefact integrity
+
+  cppcheck  6/6 files checked 100% done
+            4 findings, published through warnings-ng
+
+  requirements:  17
+  traced:        11
+  untraced:      6  HR-F-02 HR-F-03 HR-F-05 HR-F-06 HR-F-07 SR-F-07
+  broken links:  0
+  coverage:      64.7%  (baseline 64.7%)
+  PASS
+
+  artefacts   5 models, entry point present in each generated directory</pre>
+  </div>
+
+  <h3>The traceability gate</h3>
+  <p>This is the stage worth reading the source of. It pulls the seventeen requirement IDs directly out of <code>docs/requirements-specification.xlsx</code> — the specification itself is the input, not a transcription of it that can drift — resolves each against a committed map, and separates two different failures:</p>
+  <ul>
+    <li><b>A broken link</b> — a requirement pointing at a file that has been renamed or deleted — always fails the build. This is the case that actually matters, because it is the one that happens silently.</li>
+    <li><b>A coverage regression</b> below the committed baseline fails the build. Incomplete coverage does not, which is why the baseline sits at the real number rather than at an aspirational one.</li>
+  </ul>
+  <p>Six requirements are untraced deliberately. <code>HR-F-02</code>, <code>HR-F-03</code>, <code>HR-F-05</code>, <code>HR-F-06</code> and <code>HR-F-07</code> are satisfied by physical hardware, and <code>SR-F-07</code> by material in the writeup — none of which is a file in this repository. Mapping them to something merely to raise the percentage would defeat the purpose of the gate.</p>
+
+  <div class="callout">
+    <div class="label">Why there is no compile job</div>
+    <p>The generated C in <code>firmware/generated</code> includes eleven MathWorks and Arduino headers — <code>MW_ArduinoHWInit.h</code>, <code>arduinoARM_M0plusScheduler.h</code>, <code>xcp.h</code>, <code>ext_mode.h</code>, <code>tmwtypes.h</code> among them — that are vendor files and are deliberately not in this repository. Nothing here can link.</p>
+    <p>A pipeline reporting a green firmware build under those conditions would be measuring nothing at all. The three stages above were chosen because they verify things that are actually present. A real compile belongs on a labelled agent carrying <code>gcc-arm-none-eabi</code>, once the toolchain is available to put there.</p>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">03 — Mapping</p>
+  <h2>Every right-arm box becomes a job</h2>
+  <p>I annotated its V-model with a tool per stage — Excel, Visio, PlantUML, Simulink, Data Inspector. The retrofit keeps the same V and replaces "a person opens the tool" with "a job runs and reports".</p>
+
+  <div class="vmodel">
+    <div class="vcol">
+      <h4>V-model stage</h4>
+      <div class="vstep"><code>REQ</code><span>Requirements engineering</span></div>
+      <div class="vstep"><code>ARCH</code><span>Software architecture &amp; UML</span></div>
+      <div class="vstep"><code>IMPL</code><span>Implementation — model</span></div>
+      <div class="vstep"><code>IMPL</code><span>Implementation — generated C</span></div>
+      <div class="vstep"><code>MIL</code><span>Model-in-the-Loop test</span></div>
+      <div class="vstep"><code>PIL</code><span>Processor-in-the-Loop test</span></div>
+      <div class="vstep"><code>ROB</code><span>Run-on-Board evaluation</span></div>
+      <div class="vstep"><code>VER</code><span>Verification table</span></div>
+    </div>
+    <div class="vcol">
+      <h4>CI job</h4>
+      <div class="vstep"><code>trace</code><span>Requirement IDs read from the spec must resolve to artefacts that exist — a broken link fails the build</span><span class="st st-built">built</span></div>
+      <div class="vstep"><code>uml</code><span>PlantUML sources render in CI; diagrams published as artifacts, never hand-exported</span><span class="st st-design">designed</span></div>
+      <div class="vstep"><code>mil</code><span>Headless MATLAB batch run; path error asserted against the ±1% tolerance of <code>SR-F-04</code></span><span class="st st-design">designed</span></div>
+      <div class="vstep"><code>codegen</code><span>Generated C diffed against a committed baseline — a silent model change shows up as a code diff</span><span class="st st-design">designed</span></div>
+      <div class="vstep"><code>static</code><span><code>cppcheck</code> over the generated sources, findings published and trended per build</span><span class="st st-built">built</span></div>
+      <div class="vstep"><code>artefacts</code><span>Every generated directory carries an entry point; provenance record present</span><span class="st st-built">built</span></div>
+      <div class="vstep"><code>compile</code><span><code>arduino-cli</code> build on a pinned toolchain, flash-size and RAM report per build</span><span class="st st-design">designed</span></div>
+      <div class="vstep"><code>hil</code><span>Self-hosted runner with a board physically attached; flash, run, capture encoder telemetry</span><span class="st st-design">designed</span></div>
+      <div class="vstep"><code>verify</code><span>Verification table generated from job results — always current, never a stale document</span><span class="st st-design">designed</span></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="st st-built">built</span> runs on every build today</span>
+    <span><span class="st st-design">designed</span> specified here, not yet implemented</span>
+  </div>
+
+  <h3>Pipeline shape</h3>
+  <p>Fast, hardware-free jobs run on every push and gate the merge. Anything that needs a physical board — or a long parameter sweep — runs behind that gate, on hardware nobody has to babysit.</p>
+  <p class="dim">The diagram below is the target shape, not the current one. Of the jobs drawn, <code>trace</code> and <code>static</code> exist and run; the remaining seven are specified and unbuilt. Nothing below the merge gate exists at all, because none of the hardware is wired up.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 900 300" role="img" aria-label="Pipeline diagram: five per-push jobs — trace, static analysis, model-in-the-loop, codegen diff and compile — feeding four hardware-gated jobs: processor-in-the-loop, tuning sweep, run-on-board metric and verification report">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+
+      <text class="d-t-s" x="39" y="26">ON EVERY PUSH — NO HARDWARE — GATES THE MERGE</text>
+
+      <g class="d-box">
+        <rect x="39"  y="40" width="150" height="52" rx="8"/>
+        <rect x="207" y="40" width="150" height="52" rx="8"/>
+        <rect x="375" y="40" width="150" height="52" rx="8"/>
+        <rect x="543" y="40" width="150" height="52" rx="8"/>
+        <rect x="711" y="40" width="150" height="52" rx="8"/>
+      </g>
+      <g class="d-t" text-anchor="middle">
+        <text x="114" y="63">trace</text><text class="d-t-s" x="114" y="80" text-anchor="middle">requirement IDs</text>
+        <text x="282" y="63">static</text><text class="d-t-s" x="282" y="80" text-anchor="middle">cppcheck · clang-tidy</text>
+        <text x="450" y="63">mil</text><text class="d-t-s" x="450" y="80" text-anchor="middle">headless MATLAB</text>
+        <text x="618" y="63">codegen</text><text class="d-t-s" x="618" y="80" text-anchor="middle">diff vs baseline</text>
+        <text x="786" y="63">compile</text><text class="d-t-s" x="786" y="80" text-anchor="middle">arduino-cli · size</text>
+      </g>
+      <g class="d-arrow" marker-end="url(#ah)" color="currentColor">
+        <path d="M189,66 H203"/><path d="M357,66 H371"/><path d="M525,66 H539"/><path d="M693,66 H707"/>
+      </g>
+
+      <path class="d-arrow" marker-end="url(#ah)" d="M861,66 H878 V150 H21 V182" />
+      <text class="d-t-s" x="39" y="164">AFTER MERGE — SELF-HOSTED RUNNER WITH A BOARD ATTACHED</text>
+
+      <g class="d-box-a">
+        <rect x="39"  y="182" width="150" height="52" rx="8"/>
+        <rect x="207" y="182" width="150" height="52" rx="8"/>
+        <rect x="375" y="182" width="150" height="52" rx="8"/>
+      </g>
+      <g class="d-box">
+        <rect x="543" y="182" width="150" height="52" rx="8"/>
+      </g>
+      <g class="d-t" text-anchor="middle">
+        <text x="114" y="205">hil</text><text class="d-t-s" x="114" y="222" text-anchor="middle">flash · run · capture</text>
+        <text x="282" y="205">sweep</text><text class="d-t-s" x="282" y="222" text-anchor="middle">PID matrix</text>
+        <text x="450" y="205">score</text><text class="d-t-s" x="450" y="222" text-anchor="middle">deviation metric</text>
+        <text x="618" y="205">verify</text><text class="d-t-s" x="618" y="222" text-anchor="middle">table + release</text>
+      </g>
+      <g class="d-arrow" marker-end="url(#ah)" color="currentColor">
+        <path d="M189,208 H203"/><path d="M357,208 H371"/><path d="M525,208 H539"/>
+      </g>
+
+      <text class="d-t-a" x="39" y="262">HIGHLIGHTED JOBS NEED PHYSICAL HARDWARE — THE REASON JENKINS IS IN THE STACK</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">04 — Definitions</p>
+  <h2>One build, three orchestrators</h2>
+  <p>The same pipeline is expressed three ways on purpose. Automotive suppliers run GitLab and Jenkins far more than they run GitHub Actions, and the interesting engineering is in where the three disagree — hosted runners cannot hold a development board, GitLab and Jenkins disagree about where configuration lives, and only one of them treats "config as code" as the default rather than a plugin.</p>
+  <div class="callout">
+    <div class="label">Which of these are real files</div>
+    <p>The <b>Jenkinsfile</b> and the <b>Jenkins as code</b> definitions are in the repository and are what build #1 above actually ran. The <b>GitHub Actions</b> and <b>GitLab CI</b> tabs are illustrative — they show how the same stages would be expressed on those two systems, and neither file exists yet. Both also reference jobs from the target pipeline rather than the three that are implemented.</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tablist" role="tablist">
+      <button role="tab" aria-selected="true">GitHub Actions</button>
+      <button role="tab" aria-selected="false">GitLab CI</button>
+      <button role="tab" aria-selected="false">Jenkinsfile ·&nbsp;built</button>
+      <button role="tab" aria-selected="false">Jenkins as code ·&nbsp;built</button>
+    </div>
+
+    <div class="tabpanel" role="tabpanel">
+      <p>Public-facing build. Fast jobs only — GitHub-hosted runners have no board attached, so the hardware stages are deliberately absent and delegated to Jenkins.</p>
+      <div class="code">
+        <div class="code-head"><span>.github/workflows/ci.yml</span><span class="lang">YAML</span></div>
+<pre><span class="k">name</span>: ci
+<span class="k">on</span>: [<span class="s">push</span>, <span class="s">pull_request</span>]
+
+<span class="k">jobs</span>:
+  <span class="k">trace</span>:
+    <span class="k">runs-on</span>: ubuntu-latest
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: actions/checkout@v4
+      - <span class="k">name</span>: Requirement IDs referenced must exist
+        <span class="k">run</span>: python tools/trace_check.py docs/requirements.csv models/ tests/
+
+  <span class="k">static</span>:
+    <span class="k">runs-on</span>: ubuntu-latest
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: actions/checkout@v4
+      - <span class="k">run</span>: sudo apt-get install -y cppcheck clang-tidy
+      - <span class="k">run</span>: cppcheck --error-exitcode=1 --enable=warning,portability firmware/
+      - <span class="k">run</span>: tools/tidy.sh firmware/
+
+  <span class="k">codegen-diff</span>:
+    <span class="k">runs-on</span>: ubuntu-latest
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: actions/checkout@v4
+      - <span class="k">name</span>: Generated C must match the committed baseline
+        <span class="k">run</span>: git diff --exit-code -- firmware/generated/
+
+  <span class="k">compile</span>:
+    <span class="k">needs</span>: [<span class="s">static</span>, <span class="s">codegen-diff</span>]
+    <span class="k">runs-on</span>: ubuntu-latest
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: actions/checkout@v4
+      - <span class="k">uses</span>: arduino/setup-arduino-cli@v2
+      - <span class="k">run</span>: arduino-cli core install arduino:samd@<span class="s">1.8.14</span>
+      - <span class="k">run</span>: |
+          arduino-cli compile \
+            --fqbn arduino:samd:nano_33_iot \
+            --output-dir build/ firmware/
+      - <span class="k">uses</span>: actions/upload-artifact@v4
+        <span class="k">with</span>:
+          <span class="k">name</span>: firmware-${{ github.sha }}
+          <span class="k">path</span>: build/*.bin</pre>
+      </div>
+      <p class="dim">The toolchain version is pinned. That is the hidden requirement the project discovered when a MATLAB update silently broke the Arduino library link — expressed here as a line of config that fails loudly instead of a week of debugging.</p>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" hidden>
+      <p>Mirrored project on GitLab, same stages, plus the MATLAB job — a licensed runner can hold a MathWorks licence in a way a public hosted runner cannot. This is the closer analogue to how an OEM or supplier would actually run it.</p>
+      <div class="code">
+        <div class="code-head"><span>.gitlab-ci.yml</span><span class="lang">YAML</span></div>
+<pre><span class="k">stages</span>: [<span class="s">trace</span>, <span class="s">static</span>, <span class="s">model</span>, <span class="s">build</span>, <span class="s">report</span>]
+
+<span class="k">default</span>:
+  <span class="k">image</span>: python:3.13-slim
+  <span class="k">interruptible</span>: <span class="k">true</span>
+
+<span class="k">trace:requirements</span>:
+  <span class="k">stage</span>: trace
+  <span class="k">script</span>:
+    - python tools/trace_check.py docs/requirements.csv models/ tests/
+  <span class="k">artifacts</span>:
+    <span class="k">reports</span>:
+      <span class="k">junit</span>: reports/trace.xml
+
+<span class="k">static:c</span>:
+  <span class="k">stage</span>: static
+  <span class="k">image</span>: silkeh/clang:18
+  <span class="k">script</span>:
+    - cppcheck --error-exitcode=1 --enable=warning,portability firmware/
+
+<span class="k">model:mil</span>:
+  <span class="k">stage</span>: model
+  <span class="k">tags</span>: [<span class="s">matlab</span>]          <span class="c"># runner holding the MathWorks licence</span>
+  <span class="k">script</span>:
+    - matlab -batch "run_mil_suite"
+  <span class="k">artifacts</span>:
+    <span class="k">paths</span>: [<span class="s">reports/mil/</span>]
+    <span class="k">expire_in</span>: 90 days
+
+<span class="k">build:firmware</span>:
+  <span class="k">stage</span>: build
+  <span class="k">needs</span>: [<span class="s">static:c</span>, <span class="s">model:mil</span>]
+  <span class="k">script</span>:
+    - arduino-cli compile --fqbn arduino:samd:nano_33_iot --output-dir build/ firmware/
+  <span class="k">artifacts</span>:
+    <span class="k">paths</span>: [<span class="s">build/</span>]
+
+<span class="k">report:verification</span>:
+  <span class="k">stage</span>: report
+  <span class="k">script</span>:
+    - python tools/build_verification_table.py reports/ &gt; public/verification.md
+  <span class="k">artifacts</span>:
+    <span class="k">paths</span>: [<span class="s">public/</span>]</pre>
+      </div>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" hidden>
+      <p>The file in the repository, unabridged apart from the comment header. Three stages in parallel, publishing JUnit and cppcheck results. This is what produced build&nbsp;#1.</p>
+      <div class="code">
+        <div class="code-head"><span>Jenkinsfile</span><span class="lang">Groovy — declarative</span></div>
+<pre><span class="k">pipeline</span> {
+  <span class="k">agent any</span>
+  <span class="k">options</span> {
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: <span class="s">'20'</span>))
+  }
+
+  <span class="k">stages</span> {
+    <span class="k">stage</span>(<span class="s">'Verify'</span>) {
+      <span class="k">parallel</span> {
+        <span class="k">stage</span>(<span class="s">'Static analysis'</span>) {
+          <span class="k">steps</span> {
+            sh <span class="s">'''
+              mkdir -p ci/reports
+              <span class="c"># Vendor headers are absent by design, so missingInclude</span>
+              <span class="c"># is suppressed - it would otherwise drown real findings.</span>
+              cppcheck --enable=warning,portability \
+                       --suppress=missingInclude \
+                       --suppress=missingIncludeSystem \
+                       --inline-suppr \
+                       --xml --xml-version=2 \
+                       firmware/generated 2&gt; ci/reports/cppcheck.xml
+            '''</span>
+          }
+        }
+
+        <span class="k">stage</span>(<span class="s">'Traceability gate'</span>) {
+          <span class="k">steps</span> { sh <span class="s">'python3 ci/trace_check.py'</span> }
+        }
+
+        <span class="k">stage</span>(<span class="s">'Artefact integrity'</span>) {
+          <span class="k">steps</span> {
+            sh <span class="s">'''
+              fail=0
+              <span class="c"># Every generated directory must carry an entry point.</span>
+              for d in firmware/generated/*/; do
+                if [ ! -f "$d/ert_main.c" ]; then
+                  echo "MISSING entry point in $d"; fail=1
+                fi
+              done
+              [ -f PROVENANCE.md ] || { echo "PROVENANCE.md missing"; fail=1; }
+              exit $fail
+            '''</span>
+          }
+        }
+      }
+    }
+  }
+
+  <span class="k">post</span> {
+    <span class="k">always</span> {
+      junit allowEmptyResults: <span class="k">true</span>, testResults: <span class="s">'ci/reports/traceability.xml'</span>
+      recordIssues enabledForFailure: <span class="k">true</span>,
+                   tools: [cppCheck(pattern: <span class="s">'ci/reports/cppcheck.xml'</span>)]
+      archiveArtifacts artifacts: <span class="s">'ci/reports/*'</span>, allowEmptyArchive: <span class="k">true</span>
+    }
+  }
+}</pre>
+      </div>
+      <p class="dim">No <code>agent { label 'hil-nano33' }</code> here, and no PID sweep. Both belong in this file eventually; neither has hardware behind it yet, so neither is written.</p>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" hidden>
+      <p>Jenkins configured by a file in the repository, not by clicking through the web UI. This is the part that matters: a hand-clicked Jenkins leaves no artifact, cannot be reviewed, and cannot be rebuilt after a disk failure. The controller below boots from nothing, with the setup wizard disabled, and creates its own job.</p>
+      <div class="code">
+        <div class="code-head"><span>ci/jenkins/jenkins.yaml — JCasC</span><span class="lang">YAML</span></div>
+<pre><span class="k">jenkins</span>:
+  <span class="k">systemMessage</span>: <span class="s">"concept-car - verification pipeline"</span>
+  <span class="k">numExecutors</span>: 2
+  <span class="k">securityRealm</span>:
+    <span class="k">local</span>:
+      <span class="k">allowsSignup</span>: <span class="k">false</span>
+      <span class="k">users</span>:
+        - <span class="k">id</span>: <span class="s">"${JENKINS_ADMIN_ID}"</span>
+          <span class="k">password</span>: <span class="s">"${JENKINS_ADMIN_PASSWORD}"</span>
+  <span class="k">authorizationStrategy</span>:
+    <span class="k">globalMatrix</span>:
+      <span class="k">entries</span>:
+        - <span class="k">user</span>:
+            <span class="k">name</span>: <span class="s">"${JENKINS_ADMIN_ID}"</span>
+            <span class="k">permissions</span>: [<span class="s">"Overall/Administer"</span>]
+
+<span class="k">jobs</span>:
+  - <span class="k">script</span>: &gt;
+      pipelineJob('concept-car-verification') {
+        definition {
+          cpsScm {
+            scm { git { remote { url('/workspace') } branch('main') } }
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }</pre>
+      </div>
+      <p class="dim">There is no <code>hil-nano33</code> node declared, because there is no such machine. Adding one is a change to this file and nothing else — which is the argument for configuration-as-code in the first place.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">05 — Scale</p>
+  <h2>What changes when it is a team, not a person</h2>
+  <p class="lede">A solo V-model and a team V-model fail differently. Alone, the risk is throughput. With five engineers, the risk is that two of them change the same model and nobody can tell.</p>
+
+  <h3>Simulink models are binaries, and that is the hard problem</h3>
+  <p>A <code>.slx</code> is a zip container. Git will happily store it, show <em>binary files differ</em>, and offer no merge. On a solo project this never surfaces. On a team it is the single largest source of lost work in model-based development.</p>
+  <ul>
+    <li><strong>Lock, do not merge.</strong> Model files get <code>lockable</code> in <code>.gitattributes</code> and are checked out exclusively — the team convention is enforced by tooling, not by a wiki page.</li>
+    <li><strong>Decompose so locks are cheap.</strong> One monolithic model means one lock and a queue. Model references split the design so the encoder subsystem and the path logic can be edited at the same time.</li>
+    <li><strong>Review the generated C, not the binary.</strong> The <code>codegen</code> job makes every model change visible as a readable diff in <code>firmware/generated/</code>. That diff is what a reviewer actually reads on a merge request.</li>
+  </ul>
+  <div class="code">
+    <div class="code-head"><span>.gitattributes</span><span class="lang">Git</span></div>
+<pre><span class="c"># Simulink and Stateflow artifacts are binary — no textual merge exists</span>
+*.slx   binary lockable
+*.mdl   binary lockable
+*.mlx   binary lockable
+*.sldd  binary lockable
+
+<span class="c"># Generated C is the reviewable surface of a model change</span>
+firmware/generated/** text eol=lf</pre>
+  </div>
+
+  <h3>Hardware is a shared, finite resource</h3>
+  <p>One board, many engineers. The HIL agent is a single-executor Jenkins node with <code>disableConcurrentBuilds()</code>, so hardware jobs queue rather than collide. Scaling means adding labelled agents — <code>hil-nano33</code>, later <code>hil-samd51</code> — and letting the label selector route work, not rewriting the pipeline.</p>
+
+  <h3>Traceability stops being paperwork</h3>
+  <p>In the project the verification table was written once, by hand, at the end. At team scale that document is stale the day after it is written. The retrofit inverts it: <code>SR-</code> IDs appear in commit trailers, model annotations, and test names, the <code>trace</code> job fails the build when an ID does not exist, and the table is regenerated from job results on every run.</p>
+  <div class="code">
+    <div class="code-head"><span>commit message convention</span><span class="lang">Git</span></div>
+<pre>feat(control): clamp integral term in distance PID
+
+Windup on the straight section pushed the correction past the
+motor duty limit, which showed up as overshoot at the first corner.
+
+Verifies: SR-F-02, SR-F-04
+Trial-data: reports/sweep/2026-09-05T14-22Z/</pre>
+  </div>
+
+  <h3>The merge gate, written down</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Gate</th><th>Enforced by</th><th>Blocks merge</th></tr></thead>
+      <tbody>
+        <tr><td>Referenced requirement IDs exist</td><td><code>trace</code> job</td><td class="pass">Yes</td></tr>
+        <tr><td>No new cppcheck or clang-tidy warnings</td><td><code>static</code> job</td><td class="pass">Yes</td></tr>
+        <tr><td>MiL path error within ±1%</td><td><code>mil</code> job</td><td class="pass">Yes</td></tr>
+        <tr><td>Generated C matches committed baseline</td><td><code>codegen-diff</code> job</td><td class="pass">Yes</td></tr>
+        <tr><td>Firmware compiles and fits</td><td><code>compile</code> job</td><td class="pass">Yes</td></tr>
+        <tr><td>Model file lock held by the author</td><td><code>.gitattributes</code> + LFS locks</td><td class="pass">Yes</td></tr>
+        <tr><td>HIL deviation not worse than previous main</td><td><code>score</code> job</td><td>Warn — reviewer decides</td></tr>
+        <tr><td>One human approval on the MR</td><td>Branch protection</td><td class="pass">Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">06 — Result</p>
+  <h2>What the retrofit is actually worth</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>Original — manual</th><th>Pipeline — target</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Requirement traceability</td><td>A table, written once, correct on the day it was written</td><td>Read from the spec on every build; a broken link fails it</td><td><span class="st st-built">built</span></td></tr>
+        <tr><td>Static analysis</td><td>Not performed</td><td><code>cppcheck</code> per build, findings trended</td><td><span class="st st-built">built</span></td></tr>
+        <tr><td>Reproducing the CI server</td><td>n/a</td><td>Whole controller rebuilt from a file in the repo</td><td><span class="st st-built">built</span></td></tr>
+        <tr><td>Tethered tuning trials</td><td>59, by hand</td><td>Matrix cells, unattended</td><td><span class="st st-design">designed</span></td></tr>
+        <tr><td>Untethered validation runs</td><td>3</td><td>Bounded by hardware time, not patience</td><td><span class="st st-design">designed</span></td></tr>
+        <tr><td>Run-on-board verdict</td><td>A person watching a track</td><td>Numeric deviation, trended across builds</td><td><span class="st st-design">designed</span></td></tr>
+        <tr><td>Toolchain breakage</td><td>Days of debugging, found by accident</td><td>Pinned version, fails on the first build</td><td><span class="st st-design">designed</span></td></tr>
+        <tr><td>Verification table</td><td>Written once, at the end</td><td>Generated per run from job results</td><td><span class="st st-design">designed</span></td></tr>
+        <tr><td>Model change review</td><td>Not possible — binary file</td><td>Generated-C diff on the merge request</td><td><span class="st st-design">designed</span></td></tr>
+        <tr><td>Reading the firmware that shipped</td><td>Generated C for both run-on-board models was cleaned up after the build — only the linked binaries survive</td><td>Generated sources archived per build; the code behind any binary stays readable</td><td><span class="st st-design">designed</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Three of ten. That is the honest position, and it is the reason the first three rows are the ones worth reading — they are the rows where a claim can be checked against a build log rather than taken on trust.</p>
+  <p>The engineering conclusion of the project does not change: the V-model is the right shape for safety-critical embedded work, and it was applied correctly. What changes is that the right arm of the V stops being a thing one person does once, and starts being a thing the repository does continuously — which is the only version of it that survives contact with a team. The remaining seven rows are what finishing that argument costs.</p>
+  <p><a href="index.html">← Back to the project and the V-model</a></p>
+</section>
+
+<footer>
+  <p>The pipeline is later work, built on top of the finished project, and its commit history is dated to when it was written. Original trial data is reproduced unchanged on the build-detail page, including the failed runs. Jobs marked <span class="st st-built">built</span> run today and their output on this page is copied from a real build log; jobs marked <span class="st st-design">designed</span> are specifications, and no result is claimed for them anywhere.</p>
+</footer>
+
+</div>
+<script src="tabs.js"></script>

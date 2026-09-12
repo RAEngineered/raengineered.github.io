@@ -23,7 +23,7 @@ Vehicle systems, CAN/HIL test, and the tooling around them. I build the automati
 
 ### Model-Based Design
 
-- **Concept Car — autonomous driving function** _(private)_ — Two-wheeled vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21.
+- **Concept Car — autonomous driving function** _(private)_ — Two-wheeled vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21. — [write-up](https://raengineered.github.io/concept-car/concept-car.html)
 
 ---
 

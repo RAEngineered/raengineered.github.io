@@ -1,0 +1,472 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Concept Car — build detail</title>
+<link rel="stylesheet" href="style.css">
+
+<nav class="topnav">
+  <div class="wrap">
+    <a class="back" href="../">&larr; portfolio</a>
+    <span class="brand">concept-car</span>
+    <a href="concept-car.html">Project</a>
+    <a href="index.html" aria-current="page">Deep dive</a>
+    <a href="pipeline.html">Pipeline</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="kicker">Build detail · every stage, in order</p>
+  <h1>Every stage of the build, in the order it happened</h1>
+  <p class="standfirst">A supervisory controls stack for a microcontroller-based concept car, taken end-to-end through the software V-model — requirements, architecture, model-in-the-loop, processor-in-the-loop, run-on-board — to show what a formal embedded software process actually costs and produces.</p>
+  <div class="chips">
+    <span class="chip">Arduino Nano 33 IoT</span>
+    <span class="chip">C — Embedded Coder</span>
+    <span class="chip">Model-Based Design</span>
+    <span class="chip">MATLAB / Simulink</span>
+    <span class="chip">Stateflow</span>
+    <span class="chip">PlantUML / SysML</span>
+    <span class="chip">V-Model</span>
+    <span class="chip">PID control</span>
+    <span class="chip">I²C</span>
+  </div>
+  <div class="meta">
+    <span><b>Scope</b> solo, requirements → hardware</span>
+    <span><b>Feedback</b> wheel encoders only</span>
+    <span><b>Target</b> Arduino Nano 33 IoT · SAMD21</span>
+  </div>
+</header>
+
+<section>
+  <p class="sec-num">01 — Premise</p>
+  <h2>Automotive software is safety-critical and under-taught</h2>
+  <p class="lede">Mechanical engineers moving into software-defined vehicles inherit a discipline nobody handed them a process for. This project treats that gap as the actual problem: not "can a rover follow a line," but "what does the full formal path from requirement to flashed binary look like, and where does it break?"</p>
+  <p>The deliverable is a concept car — an Arduino Nano 33 IoT on a MotorCarrier board, driving DC motors with wheel-speed encoder feedback through a PID controller — developed in both virtual and physical form and verified against written acceptance criteria at every stage.</p>
+  <p>The engineering claim is the process, not the vehicle. Every artifact a production automotive team would be asked for was produced: a requirements specification with traceable IDs, a layered architecture decomposition, UML block and class diagrams, a plant model derived from kinematics, three distinct test stages, and a verification table closing each requirement.</p>
+
+  <div class="figrow">
+    <figure>
+      <img src="assets/fig47-nano-motorcarrier-cad.jpg" alt="CAD render of the Arduino Nano 33 IoT mounted on the MotorCarrier board">
+      <figcaption>Fig 47 — Nano 33 IoT and MotorCarrier</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/fig46-rob-setup.png" alt="Physical run-on-board path following test setup with taped track">
+      <figcaption>Fig 46 — Run-on-board test setup</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">02 — Process</p>
+  <h2>The V-model, executed by hand</h2>
+  <p>Each design activity on the left arm was bound to a verification activity on the right arm before implementation started. I mapped a specific tool to every box — this figure is the reason the project is worth rerunning, because each right-hand box is a job that a CI system could run and nobody was running.</p>
+
+  <figure>
+    <img src="assets/dg-vmodel.svg" alt="V-model diagram annotated with the tool used at each stage: Excel for requirements and acceptance testing, Visio and PlantUML for system design, MATLAB and Simulink for implementation and testing, Simulink Data Inspector for system testing">
+    <figcaption>The V — each right-arm activity verifies the left-arm one at the same height. Tooling per stage: Excel for requirements, Visio and PlantUML for design, MATLAB/Simulink for implementation and test, Data Inspector for signal comparison. <span class="dim">Redrawn.</span></figcaption>
+  </figure>
+
+  <div class="vmodel">
+    <div class="vcol">
+      <h4>Design — descending</h4>
+      <div class="vstep"><code>REQ</code><span>Requirements engineering — classified, ID-tagged, constraint-bound</span></div>
+      <div class="vstep"><code>SYS</code><span>System design — plant equations, kinematics, variable set</span></div>
+      <div class="vstep"><code>ARCH</code><span>Software architecture — layered decomposition, UML</span></div>
+      <div class="vstep"><code>FUNC</code><span>Functional design — motor curve, controller structure</span></div>
+      <div class="vstep"><code>IMPL</code><span>Implementation — Simulink models, generated C</span></div>
+    </div>
+    <div class="vcol">
+      <h4>Test — ascending</h4>
+      <div class="vstep"><code>MIL</code><span>Model-in-the-Loop — plant and controller in simulation</span></div>
+      <div class="vstep"><code>PIL</code><span>Processor-in-the-Loop — generated C on target, host-tethered</span></div>
+      <div class="vstep"><code>ROB</code><span>Run-on-Board — untethered, physical track</span></div>
+      <div class="vstep"><code>VER</code><span>Evaluation — per-stage verification and validation</span></div>
+      <div class="vstep"><code>VER</code><span>Verification table — requirements closed or not</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">03 — Requirements</p>
+  <h2>Traceable IDs, constraints written down</h2>
+  <p>Requirements were classified functional or non-functional, tagged <code>SR</code> for "software requirement" so a mixed mechanical/software artifact stays filterable, and layered as system, component, or software level. Constraints — including licensing and toolchain limits — were recorded alongside the requirement rather than discovered later.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ID</th><th>Requirement</th><th>Acceptance criterion</th><th>Level</th></tr></thead>
+      <tbody>
+        <tr><td class="rid">SR-F-01</td><td>System modelling in MATLAB / Simulink</td><td>Create and simulate dynamic models spanning ≥10 mechanical and electrical component types</td><td>System</td></tr>
+        <tr><td class="rid">SR-F-02</td><td>PID control for motor position</td><td>Hold motor position within ±1°</td><td>Component</td></tr>
+        <tr><td class="rid">SR-F-03</td><td>Simulink ↔ Arduino support package compatibility</td><td>Locate Arduino block library and compile for target</td><td>System</td></tr>
+        <tr><td class="rid">SR-F-04</td><td>Follow a prescribed path in simulation</td><td>Desired versus simulated concept-car behaviour match within ±1%</td><td>Software</td></tr>
+        <tr><td class="rid">SR-F-05</td><td>Text-based programming in MATLAB</td><td>Support ≥100 custom functions and scripts</td><td>System</td></tr>
+        <tr><td class="rid">SR-F-06</td><td>Visual programming in Simulink</td><td>≥50 pre-built blocks plus custom block creation</td><td>System</td></tr>
+        <tr><td class="rid">SR-F-07</td><td>Apply signal filtering to sensor input</td><td>Handle noisy encoder feedback within the simulation host's capability</td><td>Software</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="dim">Extract of the full specification (Table 7). The complete table, including non-functional requirements and per-row constraints, ships in the repository as the source spreadsheet.</p>
+
+  <div class="callout">
+    <div class="label">A requirement discovered the hard way</div>
+    <p>A MATLAB release update moved a folder on the critical path and silently broke the link to the Arduino support library. Several days of debugging with MathWorks support produced a requirement that had never been written down: <em>the Arduino library and the Simulink library must remain compatible for the duration of the project</em>. Toolchain version pinning is not an implementation detail — it is a requirement, and it surfaced only because something broke.</p>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">04 — Design</p>
+  <h2>Decomposition, kinematics, architecture</h2>
+  <p>The design was decomposed iteratively — an initial split, then a layered redecomposition — before any model was drawn. Differential-drive kinematics were derived into a plant model with a documented variable set, and a DC gear motor was characterised experimentally to give the controller a real response curve to work against.</p>
+
+  <div class="figrow">
+    <figure>
+      <img src="assets/dg-kinematics.svg" alt="Concept car kinematics diagram showing wheel geometry and body frame">
+      <figcaption>Differential drive kinematics, with the governing relations. <span class="dim">Redrawn.</span></figcaption>
+    </figure>
+    <figure>
+      <img src="assets/fig16-motor-flowchart.png" alt="Motor control system flow chart">
+      <figcaption>Fig 16 — Motor control system flow</figcaption>
+    </figure>
+  </div>
+
+  <h3>Motor characterisation</h3>
+  <p>Rather than assume a transfer function, the motor was driven across its PWM range and its response recorded, producing the curve the controller was later tuned against. The characterisation scripts and captured response data are in the repository.</p>
+
+  <figure>
+    <img src="assets/dg-motor-curve.svg" alt="DC motor characterization curve produced by running the Simulink characterisation model">
+    <figcaption>Measured DC motor steady-state response. <span class="dim">Replotted from the original <code>motorResponse</code> data, not traced.</span></figcaption>
+  </figure>
+
+  <h3>Where the software boundary sits</h3>
+  <p>The controller does not talk to the motors directly. The Nano is I²C master to a co-processor on the MotorCarrier board that runs the motor loop, so part of the control problem is deciding what belongs above that bus and what belongs below it. Everything above it is the work described here; everything below it is a vendor device with a fixed interface.</p>
+
+  <figure>
+    <img src="assets/dg-i2c.svg" alt="I2C master-slave relationship between the Nano 33 IoT and the MotorCarrier co-processor">
+    <figcaption>I²C topology. The Nano is master; the motor carrier co-processor closes the innermost motor loop. <span class="dim">Redrawn for this hardware.</span></figcaption>
+  </figure>
+
+  <p>Below the bus the interface is fixed by someone else, which makes reading it part of the design work rather than an afterthought. The dependency was documented as a class diagram before any control model was built, so the constraints it imposes — fixed-point gain types, a control loop running on the co-processor's own schedule, encoder counts rather than angles — were known while the architecture was still movable.</p>
+
+  <figure>
+    <img src="assets/dg-uml-classes.svg" alt="UML class diagram documenting the Arduino library that provides the concept-car control interface">
+    <figcaption>Class structure of the vendor control interface — my documentation of the dependency boundary, drawn to fix the contract before designing above it. The library itself is Arduino AG, LGPL-2.1, and is not reproduced here. <span class="dim">Redrawn.</span></figcaption>
+  </figure>
+
+  <h3>UML and SysML</h3>
+  <p>Interfaces were captured as UML rather than described in prose, and the diagrams were written as PlantUML source so they live in version control as text instead of as a binary drawing. Three of the diagrams and their source are reproduced below.</p>
+
+  <div class="tabs">
+    <div class="tablist" role="tablist">
+      <button role="tab" aria-selected="true">MiL data flow</button>
+      <button role="tab" aria-selected="false">Encoder class diagram</button>
+      <button role="tab" aria-selected="false">Closed-loop distance</button>
+    </div>
+
+    <div class="tabpanel" role="tabpanel">
+      <p>The model-in-the-loop pipeline as three stereotyped rectangles — signal creation, kinematics, visualisation. Deliberately coarse: this is the diagram that fixes the boundaries before any block is placed.</p>
+      <div class="code">
+        <div class="code-head"><span>docs/uml/mil-dataflow.puml</span><span class="lang">PlantUML</span></div>
+<pre><span class="k">@startuml</span>
+<span class="k">skinparam</span> rectangle {
+   BackgroundColor&lt;&lt;Input&gt;&gt; White
+   BackgroundColor&lt;&lt;Calculation&gt;&gt; White
+   BackgroundColor&lt;&lt;Visualization&gt;&gt; White
+   Dimension 300x200
+}
+
+<span class="k">rectangle</span> <span class="s">"Create velocity and angular velocity signals"</span> &lt;&lt;Input&gt;&gt; as input
+<span class="k">rectangle</span> <span class="s">"Vehicle Kinematics"</span> &lt;&lt;Calculation&gt;&gt; as calculation
+<span class="k">rectangle</span> <span class="s">"Visualization of the simulated path"</span> &lt;&lt;Visualization&gt;&gt; as visualization
+
+input -right-&gt; calculation
+calculation -right-&gt; visualization
+<span class="k">@enduml</span></pre>
+      </div>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" hidden>
+      <p>The encoder chain, as classes. A wheel-speed signal is integrated over time into an angular position in degrees — the quantity the position controller actually closes on.</p>
+      <div class="code">
+        <div class="code-head"><span>docs/uml/encoder.puml</span><span class="lang">PlantUML</span></div>
+<pre><span class="c">%UML Source code for Encoder UML diagram</span>
+<span class="k">@startuml</span>
+<span class="k">!define</span> RECTANGLE class
+
+RECTANGLE WheelSpeed {
+   +input: inherit auto
+}
+RECTANGLE DiscreteTimeIntegrator {
+   +integrate(input: inherit auto): inherit auto
+}
+RECTANGLE Degrees {
+   +output: inherit auto
+}
+
+WheelSpeed --&gt; DiscreteTimeIntegrator : input
+DiscreteTimeIntegrator --&gt; Degrees : output
+<span class="k">@enduml</span></pre>
+      </div>
+      <figure>
+        <img src="assets/dg-encoder-chain.svg" alt="Architecture of the encoder simulation subsystem in Simulink">
+        <figcaption>Encoder feedback chain — wheel speed integrated to an accumulated angle. <span class="dim">Redrawn.</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" hidden>
+      <p>The closed-loop distance controller. Setpoint from the timing chart, subtract measured distance, error into the PID, output converted to per-wheel velocity and split across the two motors. Angular velocity enters as a separate input to the conversion so heading and distance stay independently commandable.</p>
+      <div class="code">
+        <div class="code-head"><span>docs/uml/distance-closed-loop.puml</span><span class="lang">PlantUML</span></div>
+<pre><span class="c">Source code for distanceClosedloop_hw diagram</span>
+<span class="k">@startuml</span>
+<span class="k">skinparam</span> rectangle {
+   BackgroundColor&lt;&lt;Subsystem&gt;&gt; LightBlue
+   BorderColor&lt;&lt;Subsystem&gt;&gt; DarkBlue
+}
+
+<span class="k">rectangle</span> <span class="s">"Input\n(Timing Chart)"</span> as input
+<span class="k">rectangle</span> <span class="s">"Actual distance"</span> as actualDistance
+<span class="k">rectangle</span> <span class="s">"PID controller"</span> as pidController
+<span class="k">rectangle</span> <span class="s">"Angular velocity"</span> as angularVelocity
+<span class="k">rectangle</span> <span class="s">"Convert to wheel velocity"</span> &lt;&lt;Subsystem&gt;&gt; as convertToWheelVelocity
+<span class="k">rectangle</span> <span class="s">"LeftMotor"</span> as leftMotor
+<span class="k">rectangle</span> <span class="s">"RightMotor"</span> as rightMotor
+
+input -down-&gt; actualDistance : Subtract
+actualDistance -down-&gt; pidController : Error
+pidController -down-&gt; convertToWheelVelocity
+angularVelocity -right-&gt; convertToWheelVelocity
+convertToWheelVelocity -down-&gt; leftMotor
+convertToWheelVelocity -down-&gt; rightMotor
+<span class="k">@enduml</span></pre>
+      </div>
+      <figure>
+        <img src="assets/fig31-pid-arch.png" alt="Architecture diagram for the closed-loop PID control model">
+        <figcaption>Fig 31 — Architecture diagram for the closed-loop PID control model</figcaption>
+      </figure>
+    </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">05 — Implementation</p>
+  <h2>Three stages, increasing reality</h2>
+  <p>Each stage keeps the same controller and swaps out how much of the world is real. Simulation first, then real generated code on the real chip with a host watching, then the tether cut.</p>
+
+  <div class="tabs">
+    <div class="tablist" role="tablist">
+      <button role="tab" aria-selected="true">Stage 1 — Model-in-the-Loop</button>
+      <button role="tab" aria-selected="false">Stage 2 — Processor-in-the-Loop</button>
+      <button role="tab" aria-selected="false">Stage 3 — Run-on-Board</button>
+    </div>
+
+    <div class="tabpanel" role="tabpanel">
+      <div class="stage-head"><span class="tag">Stage 1</span><h3>Everything is simulated</h3></div>
+      <p>Plant model and controller run entirely in simulation. Commanded linear and angular velocity are generated from a timing chart, pushed through differential kinematics, and the resulting path is plotted against the intended track. Nothing here touches hardware, so an error is a modelling error and nothing else — which is the whole point of doing it first.</p>
+
+      <div class="figrow">
+        <figure>
+          <img src="assets/fig22-diff-kinematics.png" alt="Simulink model implementing differential kinematics of the vehicle">
+          <figcaption>Fig 22 — Differential kinematics in Simulink</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/fig26-vehicle-sim.png" alt="Inside the vehicle simulation subsystem">
+          <figcaption>Fig 26 — Inside the vehicle simulation subsystem</figcaption>
+        </figure>
+      </div>
+      <figure>
+        <img src="assets/fig30-course-sim.png" alt="Plot of the simulated concept car course">
+        <figcaption>Fig 30 — Simulated course. Commanded track versus modelled vehicle path.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/dg-mil-path.svg" alt="Model-in-the-loop concept car path result">
+        <figcaption>Simulated path — the model closes the square exactly. <span class="dim">Replotted from the original.</span></figcaption>
+      </figure>
+
+      <div class="verdict"><span class="pass">PASS</span> — the virtual concept car followed the commanded track inside the ±1% acceptance criterion of <code>SR-F-04</code>.</div>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" hidden>
+      <div class="stage-head"><span class="tag">Stage 2</span><h3>Real code, real chip, host attached</h3></div>
+      <p>Simulink generates C, the C is compiled for the SAMD21, and the binary runs on the board while Simulink stays attached over XCP-on-serial in external mode. Signals stream back live, so the PID constants can be changed and their effect watched without reflashing.</p>
+      <p>This stage is where the tuning happened, and where the cost of the manual loop shows up: <strong>59 recorded trials</strong> to develop, tune, and test the controller — each one a human deciding what to change next.</p>
+
+      <div class="figrow">
+        <figure>
+          <img src="assets/fig32-closed-loop.png" alt="Closed-loop distance model in Simulink">
+          <figcaption>Fig 32 — Closed-loop distance model</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/fig35-pid-constants.png" alt="PID controller constants block parameters">
+          <figcaption>Fig 35 — PID controller constants</figcaption>
+        </figure>
+      </div>
+      <div class="figrow">
+        <figure>
+          <img src="assets/dg-step-response.svg" alt="Comparison of signals before and after PID tuning">
+          <figcaption>Closed-loop step response against a reference of 90. <span class="dim">Replotted from the original scope trace.</span></figcaption>
+        </figure>
+        <figure>
+          <img src="assets/fig38-trial59.png" alt="Signal traces from trial 59">
+          <figcaption>Fig 38 — Trial 59 result signals</figcaption>
+        </figure>
+      </div>
+      <figure>
+        <img src="assets/dg-velocity-tracking.svg" alt="Four-panel chart of velocity and position behaviour across the experiment">
+        <figcaption>Commanded against measured forward velocity — four phases, one per side of the square. <span class="dim">Replotted from the run telemetry.</span></figcaption>
+      </figure>
+
+      <h4>What the generated code actually looks like</h4>
+      <p>Embedded Coder emits a bare-metal single-rate scheduler. The interesting part is not the maths — it is that overrun detection, interrupt masking, and external-mode transport are all generated, and all of it is code that has to compile and link on the target before anyone can test anything.</p>
+      <div class="code">
+        <div class="code-head"><span>distanceClosedloop_hw_ert_rtw/ert_main.c — reformatted excerpt</span><span class="lang">C</span></div>
+<pre><span class="k">volatile int</span>       IsrOverrun  = 0;
+<span class="k">static boolean_T</span>   OverrunFlag = 0;
+
+<span class="k">void</span> rt_OneStep(<span class="k">void</span>)
+{
+    <span class="c">/* re-entrancy guard: the step did not finish before the next tick */</span>
+    <span class="k">if</span> (OverrunFlag++) {
+        IsrOverrun = 1;
+        OverrunFlag--;
+        <span class="k">return</span>;
+    }
+
+<span class="k">#ifndef</span> _MW_ARDUINO_LOOP_
+    interrupts();
+<span class="k">#endif</span>
+
+    distanceClosedloop_hw_step();
+
+<span class="k">#ifndef</span> _MW_ARDUINO_LOOP_
+    noInterrupts();
+<span class="k">#endif</span>
+
+    OverrunFlag--;
+}</pre>
+      </div>
+      <p class="dim">Whitespace and identifiers restored for readability — Embedded Coder ships obfuscated symbol names and collapsed formatting in this configuration. The control flow is unchanged.</p>
+
+      <h4>Target configuration, as generated</h4>
+      <p>The hardware contract is a generated header. Bare metal, no RTOS; external mode over XCP on a 115200 serial link; I²C at 100 kHz to reach the MotorCarrier. Every one of these is a value that must match the physical setup or nothing runs.</p>
+      <div class="code">
+        <div class="code-head"><span>MW_target_hardware_resources.h — excerpt</span><span class="lang">C</span></div>
+<pre><span class="k">#define</span> MW_TARGETHARDWARE                Arduino Nano 33 IoT
+<span class="k">#define</span> MW_RTOS                          Baremetal
+<span class="k">#define</span> MW_MULTI_TASKING_MODE            1
+<span class="k">#define</span> MW_SCHEDULER_INTERRUPT_SOURCE    0
+
+<span class="c">/* external mode: live signal streaming back to Simulink */</span>
+<span class="k">#define</span> MW_EXTMODE_CONFIGURATION         XCP on Serial
+<span class="k">#define</span> MW_EXTMODE_COMPORTBAUD           115200
+<span class="k">#define</span> MW_EXTMODE_SIGNALBUFFERSIZE      8192
+
+<span class="c">/* I2C link to the MotorCarrier co-processor */</span>
+<span class="k">#define</span> MW_I2C_I2C0BUSSPEEDHZ            100000</pre>
+      </div>
+
+      <div class="verdict"><span class="pass">PASS</span> — generated C compiled and ran on target; the tethered vehicle reproduced the virtual track. 59 trials to get there.</div>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" hidden>
+      <div class="stage-head"><span class="tag">Stage 3</span><h3>Tether cut</h3></div>
+      <p>Firmware flashed, host disconnected. The car drives a taped physical track under its own power, making every command and correction from the on-board binary — no PC, no operator, not an RC car. The path itself is a Stateflow chart: a sequence of linear and angular velocity commands against time.</p>
+
+      <div class="figrow">
+        <figure>
+          <img src="assets/fig42-track-path.png" alt="Track path driving function, showing the commanded route">
+          <figcaption>Fig 42 — Track path driving function</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/fig43-rob-results-table.png" alt="Table 13, run-on-board course following test results: three trials, each leaving the path at 30, 50 and 70 percent complete">
+          <figcaption>Table 13 — Run-on-board course following results</figcaption>
+        </figure>
+      </div>
+      <figure>
+        <img src="assets/fig41-statelogic.png" alt="Implementation of the StateLogic architecture in Simulink">
+        <figcaption>Fig 41 — StateLogic architecture as implemented in Simulink</figcaption>
+      </figure>
+
+      <div class="verdict"><span class="fail">FAIL</span> — the car moved autonomously, but left the track boundary on all three trials.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">06 — Results</p>
+  <h2>The honest number</h2>
+  <p>Three run-on-board trials, same track, same starting position. Leaving the marked boundary is a failure. Completing the course in bounds would be 100%; the figures below are how far the car got before going out of bounds. Between trials, PID constants and the linear and angular speed targets were adjusted and the firmware redeployed.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Trial</th><th>Result</th><th>Track completed</th></tr></thead>
+      <tbody>
+        <tr><td class="rid">1</td><td class="fail">Fail — left path</td><td>30%</td></tr>
+        <tr><td class="rid">2</td><td class="fail">Fail — left path</td><td>50%</td></tr>
+        <tr><td class="rid">3</td><td class="fail">Fail — left path</td><td>70%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <img src="assets/fig45-run-count.png" alt="Chart of experimental run counts across the project">
+    <figcaption>Fig 45 — Experimental run count across the project</figcaption>
+  </figure>
+
+  <p>Monotone improvement across three redeployments, and no fourth trial. The tuning loop was manual: change constants, rebuild, reflash, walk the track, watch with human eyes, decide pass or fail. Each iteration cost enough that three was the budget.</p>
+
+  <div class="callout">
+    <div class="label">Why this is the interesting result</div>
+    <p>The controller was not wrong. The <em>tuning process</em> was the bottleneck. Six independent PID variables across two controllers, explored by hand, with a binary pass/fail judged by a person standing over a track — 59 tethered trials to build it, and only three untethered data points to validate it. The project reaches this conclusion on its own and says so in the Outlook.</p>
+  </div>
+
+  <blockquote>The experiment could be enhanced by writing a script to automate the PID tuning process … having data from more trials, and numerical data on the degree of path deviation rather than just a pass/fail decision, would produce more information for tuning and optimizing the controller.</blockquote>
+  <p class="dim">— my own writeup, at the time</p>
+
+  <p>That sentence is the brief for the second half of this project. <a href="pipeline.html">The same build, run as a team pipeline →</a></p>
+</section>
+
+<section>
+  <p class="sec-num">07 — Provenance</p>
+  <h2>What is mine, and what is only referenced</h2>
+  <p class="lede">This project sits on top of vendor hardware libraries and a commercial modelling toolchain. Nothing borrowed is reproduced here — dependencies are named, not vendored, and the boundary is drawn explicitly so there is no ambiguity about authorship.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Artifact</th><th>Origin</th><th>In the repository</th></tr></thead>
+      <tbody>
+        <tr><td>Simulink models — MiL, PiL, run-on-board, control panel</td><td>Written for this project</td><td class="pass">Yes</td></tr>
+        <tr><td>Stateflow chart — track path state logic</td><td>Written for this project</td><td class="pass">Yes</td></tr>
+        <tr><td>Requirements specification and verification table</td><td>Written for this project</td><td class="pass">Yes</td></tr>
+        <tr><td>UML / SysML sources (PlantUML), architecture diagrams</td><td>Written for this project</td><td class="pass">Yes</td></tr>
+        <tr><td>Motor characterisation scripts and captured response data</td><td>Written for this project</td><td class="pass">Yes</td></tr>
+        <tr><td>Figures, timing charts, test procedure, recorded trial results</td><td>Produced for this project</td><td class="pass">Yes</td></tr>
+        <tr><td>Generated C and target configuration headers</td><td>Embedded Coder output from the models above</td><td class="pass">Yes — labelled as generated</td></tr>
+        <tr><td>UML class diagram of the vendor control interface</td><td>Drawn for this project to document a dependency</td><td class="pass">Yes — diagram only, not the library</td></tr>
+        <tr><td>Arduino MotorCarrier and device libraries</td><td>Arduino AG, LGPL-2.1</td><td>No — named as a dependency</td></tr>
+        <tr><td>MATLAB, Simulink, Stateflow, Embedded Coder, Arduino support package</td><td>MathWorks, commercial licence</td><td>No — named as a dependency</td></tr>
+        <tr><td>Arduino Engineering Kit course material and datasheets</td><td>Arduino AG / component vendors</td><td>No — not redistributable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <div class="label">How the line was drawn</div>
+    <p>Not by memory. Every candidate file was hashed with SHA-256 and compared against the stock Arduino Engineering Kit Rev 2 distribution; a file whose hash appears in the kit is stock, wherever it happens to sit in my folders. Eight files came back stock and were excluded — including one that reads as mine by filename, <code>distanceClosedloop_hw.slx.r2020b</code>, which turned out to be byte-identical to the kit's Exercise 3 model.</p>
+    <p>The dates then separate cleanly, and they describe what this project actually was: <strong>stock files date to December 2020 – June 2021; everything I built dates to December 2024 – January 2025</strong>, when the design was migrated onto a 2025 toolchain and block behaviour, support-package layout and code generation had all moved underneath it. The vendor libraries themselves were used exactly as supplied. What was rewritten is the control layer above them.</p>
+  </div>
+
+  <div class="callout">
+    <div class="label">One artifact that did not survive</div>
+    <p>The generated C for the two run-on-board models no longer exists. Those build directories still hold the object files, the makefile, and the linked <code>.elf</code> and <code>.bin</code> — but the <code>.c</code> and <code>.h</code> were cleaned up after the build. The firmware that actually drove the car can still be executed and can no longer be read.</p>
+    <p>Nothing was lost through carelessness; that is simply what a local build directory does. It is also precisely the failure a pipeline removes, by archiving generated sources against the commit that produced them.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Solo project, requirements through hardware. Figures marked as redrawn are re-rendered from the original measurement data; screenshots of the modelling environment, CAD renders and photographs are reproduced unchanged. Trial results are shown as recorded, including the runs that failed. The CI work is later, and is dated to when it was built.</p>
+</footer>
+
+</div>
+<script src="tabs.js"></script>

@@ -1,0 +1,309 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Concept Car — autonomous driving function</title>
+<link rel="stylesheet" href="style.css">
+
+<nav class="topnav">
+  <div class="wrap">
+    <a class="back" href="../">&larr; portfolio</a>
+    <span class="brand">concept-car</span>
+    <a href="concept-car.html" aria-current="page">Project</a>
+    <a href="index.html">Deep dive</a>
+    <a href="pipeline.html">Pipeline</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="kicker">Embedded control · model-based design</p>
+  <h1>An autonomous driving function, built the way vehicle software is built</h1>
+  <p class="standfirst">A two-wheeled concept car that drives a closed course under its own power. Requirements before architecture, a plant model before any control law, generated embedded C on the target, and three escalating test stages — model, processor, road. Built solo, end to end.</p>
+  <div class="chips">
+    <span class="chip">Simulink</span>
+    <span class="chip">Stateflow</span>
+    <span class="chip">MATLAB</span>
+    <span class="chip">Embedded C</span>
+    <span class="chip">PID control</span>
+    <span class="chip">Arduino / SAMD21</span>
+    <span class="chip">I²C</span>
+    <span class="chip">HiL &amp; PiL testing</span>
+    <span class="chip">Jenkins</span>
+  </div>
+  <div class="meta">
+    <span><b>Scope</b> solo, requirements → hardware</span>
+    <span><b>Outcome</b> autonomous laps, with a documented failure mode</span>
+  </div>
+</header>
+
+<section>
+  <p class="sec-num">01 — What it is</p>
+  <h2>The system in one page</h2>
+  <p class="lede">A differential-drive vehicle on an Arduino Nano 33 IoT with a motor carrier, wheel encoders as the only feedback, and a control stack developed as a model and deployed as generated C. It follows a taped square course without a tether, a host PC, or a radio link — every command and correction is computed on the board.</p>
+  <div class="figrow">
+    <figure>
+      <img src="assets/fig47-nano-motorcarrier-cad.jpg" alt="CAD render of the Arduino Nano 33 IoT mounted on the Nano Motor Carrier">
+      <figcaption>Controller and motor carrier</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/dg-i2c.svg" alt="I2C bus topology: VDD, SDA and SCL with pull-up resistors, connecting the Nano 33 IoT as master to the motor carrier and encoders">
+      <figcaption>I²C bus — one master, everything else on two shared wires</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <p class="sec-num">02 — Skills</p>
+  <h2>What this project actually demonstrates</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Skill</th><th>Where it shows up</th><th>Tools</th></tr></thead>
+      <tbody>
+        <tr><td>Model-based design</td><td>Plant model and control law developed and verified as models before any code was generated</td><td>Simulink, MATLAB</td></tr>
+        <tr><td>State machine design</td><td>Route sequencing as a Stateflow chart with relative targets and guard conditions on sensor feedback</td><td>Stateflow</td></tr>
+        <tr><td>Embedded C</td><td>Production code generated for a SAMD21 target and run untethered on the board</td><td>MATLAB Coder, Embedded Coder</td></tr>
+        <tr><td>Control engineering</td><td>Two PID loops — distance and heading — tuned empirically against a measured plant</td><td>Simulink Control Design</td></tr>
+        <tr><td>System identification</td><td>Motor characterised by measured sweep rather than datasheet values, including its dead band</td><td>MATLAB</td></tr>
+        <tr><td>Test strategy</td><td>Three-stage verification ladder, each stage removing one simulation so failures stay attributable</td><td>MiL / PiL / run-on-board</td></tr>
+        <tr><td>Requirements engineering</td><td>17 traceable requirements, each bound to a verification activity before implementation</td><td>Structured spec</td></tr>
+        <tr><td>CI / automation</td><td>Verification retrofitted as a build: static analysis and a requirements traceability gate on a controller defined entirely as code</td><td>Jenkins, JCasC, Docker, cppcheck</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="dim">The last row is later work, built on top of the project — see <a href="pipeline.html">the pipeline page</a>.</p>
+</section>
+
+<section>
+  <p class="sec-num">03 — Plant</p>
+  <h2>Model the vehicle before controlling it</h2>
+  <p>A controller is only meaningful against a plant. Differential drive gives you two independent wheel velocities; everything the vehicle can do — drive straight, arc, rotate in place — falls out of their sum and difference.</p>
+
+  <figure>
+    <img src="assets/dg-kinematics.svg" alt="Differential drive kinematics: two wheels with velocities V_l and V_r, wheelbase L, turning about an instantaneous centre of curvature at radius R, with the governing equations">
+    <figcaption>Body velocity, rotation rate and turn radius from the wheel pair. Rotating in place is the <code>V_r = −V_l</code> case, which is exactly what the turn state commands.</figcaption>
+  </figure>
+
+  <p>The motors were then characterised by measurement rather than datasheet. This matters: the response is not linear, and there is a <b>dead band</b> either side of zero where a PWM command produces no rotation at all. A control law tuned without knowing that will integrate error while the wheels sit still.</p>
+
+  <figure>
+    <img src="assets/dg-motor-curve.svg" alt="Measured DC motor steady-state response: PWM command against speed in rpm, raw sweep and monotonic fit, showing a dead band around zero">
+    <figcaption>Measured steady-state response, 100:1 gearbox. Redrawn from the original <code>motorResponse</code> data — 41-point raw sweep, 31-point monotonic fit.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <p class="sec-num">04 — Control</p>
+  <h2>Closed loop, with encoders as the only truth</h2>
+  <p>Open loop moves the car; closed loop is what makes it arrive. Wheel encoders give measured distance and heading, and two PID controllers drive those errors to zero. There is no map, no external reference, and no absolute position sensor — the vehicle knows only how far its wheels have turned.</p>
+  <figure>
+    <img src="assets/dg-closed-loop.svg" alt="Closed-loop signal flow: desired distance minus measured distance gives error, a PID controller produces velocity v, convToWheelVel turns v and w into left and right wheel speeds, and wheel encoders close the loop">
+    <figcaption>The loop, redrawn. Block names are the model's own.</figcaption>
+  </figure>
+  <figure>
+    <img src="assets/fig32-closed-loop.png" alt="The same closed loop as built in Simulink">
+    <figcaption>The same loop in Simulink — kept as evidence that the diagram above describes something that exists.</figcaption>
+  </figure>
+  <figure>
+    <img src="assets/dg-encoder-chain.svg" alt="Encoder feedback chain: wheel speed in degrees per second integrated to accumulated degrees">
+    <figcaption>Where feedback comes from — and the structural limit that sets up the failure later.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <p class="sec-num">05 — Sequencing</p>
+  <h2>The route is a state machine, not a script</h2>
+  <p class="lede">The course is not a trajectory file. It is a Stateflow chart that issues velocity and rotation commands, waits on guards computed from encoder feedback, and advances. The targets are <em>relative</em> — <code>desDist = dist + 30</code>, <code>desAng = ang + 90</code> — so four repetitions of one four-state cycle close a square, and the same chart scales to any polygon.</p>
+
+  <figure class="anim">
+    <div class="anim-head">
+      <span>square-course loop — chart, action language, and resulting path</span>
+      <span><b>animated</b> — one lap, 12 s</span>
+    </div>
+    <svg viewBox="0 0 900 330" role="img" aria-label="Three synchronised panels. Left, the state chart with the active state highlighted as it cycles through MoveForward1, Pause3, Turn1 and Pause2. Middle, the entry and during actions of whichever state is currently active. Right, the car tracing one side of the square course per cycle, stationary while paused and while turning.">
+      <defs>
+        <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="color:var(--ink-3)"/>
+        </marker>
+      </defs>
+
+      <text x="24" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">STATE CHART</text>
+      <path class="sf-edge" d="M110,58 V80"   marker-end="url(#ah2)"/>
+      <path class="sf-edge" d="M110,124 V146" marker-end="url(#ah2)"/>
+      <path class="sf-edge" d="M110,190 V212" marker-end="url(#ah2)"/>
+      <path class="sf-edge" d="M110,256 V278" marker-end="url(#ah2)"/>
+      <path class="sf-edge" d="M180,300 H236 V36 H180" marker-end="url(#ah2)"/>
+      <text class="sf-lbl" x="118" y="73">after(1,sec)</text>
+      <text class="sf-lbl" x="118" y="139">[abs(desDist-dist)&lt;0.1]</text>
+      <text class="sf-lbl" x="118" y="205">after(1,sec)</text>
+      <text class="sf-lbl" x="118" y="271">[abs(desAng-ang)&lt;0.5]</text>
+      <text class="sf-lbl" x="242" y="170">loop ×4</text>
+
+      <g class="sf-node">
+        <rect x="40" y="20" width="140" height="38" rx="7"/>
+        <rect class="lit a-p2" x="40" y="20" width="140" height="38" rx="7"/>
+        <text x="52" y="44">StopFirst1 / Pause2</text></g>
+      <g class="sf-node">
+        <rect x="40" y="86" width="140" height="38" rx="7"/>
+        <rect class="lit a-move" x="40" y="86" width="140" height="38" rx="7"/>
+        <text x="52" y="110">MoveForward1</text></g>
+      <g class="sf-node">
+        <rect x="40" y="152" width="140" height="38" rx="7"/>
+        <rect class="lit a-p3" x="40" y="152" width="140" height="38" rx="7"/>
+        <text x="52" y="176">Pause3</text></g>
+      <g class="sf-node">
+        <rect x="40" y="218" width="140" height="38" rx="7"/>
+        <rect class="lit a-turn" x="40" y="218" width="140" height="38" rx="7"/>
+        <text x="52" y="242">Turn1</text></g>
+      <g class="sf-node">
+        <rect x="40" y="284" width="140" height="34" rx="7" style="stroke-dasharray:4 3"/>
+        <text x="52" y="306" style="fill:var(--ink-3)">Stop1 · after(25,sec)</text></g>
+
+      <text x="330" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">ACTION LANGUAGE — ACTIVE STATE</text>
+      <rect x="330" y="34" width="300" height="150" rx="8" style="fill:var(--code-bg);stroke:var(--line)"/>
+      <g class="code-blk a-move">
+        <text x="346" y="58" class="hd">MoveForward1</text>
+        <text x="346" y="82" class="kw">entry:</text>
+        <text x="346" y="100">  desDist = dist + 30;</text>
+        <text x="346" y="124" class="kw">during, exit:</text>
+        <text x="346" y="142">  v = distCtrl(desDist,dist);</text>
+        <text x="346" y="160">  w = 0;</text></g>
+      <g class="code-blk a-p3">
+        <text x="346" y="58" class="hd">Pause3</text>
+        <text x="346" y="82" class="kw">entry:</text>
+        <text x="346" y="100">  v = 0;</text>
+        <text x="346" y="118">  w = 0;</text></g>
+      <g class="code-blk a-turn">
+        <text x="346" y="58" class="hd">Turn1</text>
+        <text x="346" y="82" class="kw">entry:</text>
+        <text x="346" y="100">  desAng = ang + 90;</text>
+        <text x="346" y="124" class="kw">during, exit:</text>
+        <text x="346" y="142">  v = 0;</text>
+        <text x="346" y="160">  w = angCtrl(desAng,ang);</text></g>
+      <g class="code-blk a-p2">
+        <text x="346" y="58" class="hd">Pause2 → StopFirst1</text>
+        <text x="346" y="82" class="kw">entry:</text>
+        <text x="346" y="100">  v = 0;</text>
+        <text x="346" y="118">  w = 0;</text></g>
+
+      <text x="330" y="212" class="sf-lbl">v — commanded forward velocity</text>
+      <text x="330" y="230" class="sf-lbl">w — commanded rotation rate</text>
+      <text x="330" y="248" class="sf-lbl">both feed convToWheelVel → wl, wr</text>
+      <text x="330" y="278" class="sf-lbl" style="fill:var(--ink-3)">Text is verbatim from the chart;</text>
+      <text x="330" y="294" class="sf-lbl" style="fill:var(--ink-3)">every guard is the model's own.</text>
+
+      <text x="666" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">COMMANDED COURSE</text>
+      <text x="666" y="44" class="sf-lbl">4 × (forward 30, pause, turn 90°, pause)</text>
+      <text x="666" y="62" class="sf-lbl">The loop closes because desDist and</text>
+      <text x="666" y="78" class="sf-lbl">desAng are relative, not absolute.</text>
+      <rect x="666" y="96" width="214" height="214" rx="6" style="fill:none;stroke:var(--line);stroke-dasharray:3 4"/>
+      <path class="trail" d="M 690,286 L 856,286 L 856,120 L 690,120 Z"/>
+      <g class="rover"><path class="rover-body" d="M -7,-6 L 8,0 L -7,6 L -3,0 Z"/></g>
+    </svg>
+    <figcaption>State names, entry and during actions, and guard conditions are read directly out of the Simulink model. The car is stationary during the pauses and rotates in place during the turn — <code>v = 0</code> in both.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="assets/fig41-statelogic.png" alt="The StateLogic Stateflow block inside the Simulink model, taking distance and angle from the encoders and producing velocity and rotation rate">
+    <figcaption>The chart in context — encoder feedback in, <code>v</code> and <code>w</code> out, converted to wheel speeds and issued to both motors. Screenshot from the model itself.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <p class="sec-num">06 — Interfaces</p>
+  <h2>The library surface the control code sits on</h2>
+  <p>The vehicle library was used as supplied — sensors, encoders, motors and their managers. Knowing where the boundary sits is the point: everything above it is mine, everything below it is vendor code I did not modify.</p>
+  <figure>
+    <img src="assets/dg-uml-classes.svg" alt="UML class diagram of the vehicle library: DistanceReading, DistanceSensor, Encoder, SensorManager, ActuatorManager and DCMotor, with the Sensor1 interface">
+    <figcaption>Class structure of the vendor library, redrawn. <code>Encoder::getCounts()</code> is the single source of feedback for both control loops.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <p class="sec-num">07 — Verification</p>
+  <h2>Three stages, each removing one simulation</h2>
+  <p>The same driving function is tested three times. Each stage replaces one simulated element with the real one, so when a stage fails you know which layer introduced the failure. This is the part that transfers to any embedded programme.</p>
+
+  <figure class="anim">
+    <div class="anim-head">
+      <span>MiL → PiL → run-on-board</span>
+      <span><b>animated</b> — 9 s</span>
+    </div>
+    <svg viewBox="0 0 760 230" role="img" aria-label="Three stages in sequence. Model-in-the-loop runs both controller and plant in simulation. Processor-in-the-loop puts the controller on the real microcontroller while the plant stays simulated. Run-on-board puts both on the physical car. A marker passes through each stage in turn.">
+      <g><rect class="pipe-seg" x="30"  y="110" width="180" height="80" rx="9"/>
+         <rect class="pipe-lit" x="30"  y="110" width="180" height="80" rx="9" style="animation-delay:0s"/>
+         <text class="pipe-txt" x="52" y="140">Model-in-the-loop</text>
+         <text class="pipe-sub" x="52" y="160">controller: simulated</text>
+         <text class="pipe-sub" x="52" y="175">plant: simulated</text></g>
+      <g><rect class="pipe-seg" x="290" y="110" width="180" height="80" rx="9"/>
+         <rect class="pipe-lit" x="290" y="110" width="180" height="80" rx="9" style="animation-delay:3s"/>
+         <text class="pipe-txt" x="312" y="140">Processor-in-the-loop</text>
+         <text class="pipe-sub" x="312" y="160">controller: real target</text>
+         <text class="pipe-sub" x="312" y="175">plant: simulated</text></g>
+      <g><rect class="pipe-seg" x="550" y="110" width="180" height="80" rx="9"/>
+         <rect class="pipe-lit" x="550" y="110" width="180" height="80" rx="9" style="animation-delay:6s"/>
+         <text class="pipe-txt" x="572" y="140">Run-on-board</text>
+         <text class="pipe-sub" x="572" y="160">controller: real target</text>
+         <text class="pipe-sub" x="572" y="175">plant: physical car</text></g>
+      <path class="v-arm" d="M 210,150 H 290"/>
+      <path class="v-arm" d="M 470,150 H 550"/>
+      <circle class="pipe-tok" cx="0" cy="0" r="6"/>
+      <text class="sf-lbl" x="30"  y="60">Each step removes one simulation. The controller stops being a model at PiL;</text>
+      <text class="sf-lbl" x="30"  y="78">the plant stops being a model on the board. Nothing else changes between stages,</text>
+      <text class="sf-lbl" x="30"  y="96">which is what makes a failure attributable.</text>
+    </svg>
+    <figcaption>The value of the ladder is diagnostic: behaviour that survives the first two stages and fails on the third is a physical-world problem, not a control-law problem.</figcaption>
+  </figure>
+
+  <div class="figrow">
+    <figure>
+      <img src="assets/dg-mil-path.svg" alt="Path followed in model-in-the-loop simulation">
+      <figcaption>Model-in-the-loop — the simulated vehicle closes the square exactly. <span class="dim">Replotted.</span></figcaption>
+    </figure>
+    <figure>
+      <img src="assets/fig38-trial59.png" alt="Processor-in-the-loop, trial 59, the accepted tuning">
+      <figcaption>Processor-in-the-loop — accepted tuning</figcaption>
+    </figure>
+  </div>
+  <div class="verdict"><span class="pass">PASS</span> — model and processor stages both track the commanded course.</div>
+
+  <div class="figrow">
+    <figure>
+      <img src="assets/dg-track-path.svg" alt="The commanded square course with three marked departure points at 30, 50 and 70 percent of the lap">
+      <figcaption>Commanded course, with the three recorded departures</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/fig43-rob-results-table.png" alt="Run-on-board results: three trials leaving the path at 30, 50 and 70 percent complete">
+      <figcaption>Three untethered trials</figcaption>
+    </figure>
+  </div>
+  <div class="verdict"><span class="fail">FAIL</span> — drives autonomously, but leaves the course at 30%, 50% and 70% complete.</div>
+</section>
+
+<section>
+  <p class="sec-num">08 — Judgement</p>
+  <h2>Reading the failure correctly</h2>
+  <p class="lede">Three untethered runs failed. They were preceded by <b>59 tethered tuning trials</b>, and the failures came progressively later — 30%, then 50%, then 70%. That is not a controller that does not work. That is a controller converging, sampled three times.</p>
+  <p>The binding constraint was never the control law. It was that every iteration needed a person to change a constant, rebuild, reflash and walk a track — so the project could afford 59 attempts at the cheap stage and three at the expensive one. The honest diagnosis is <b>iteration cost</b>, and the honest fix is automation, not cleverness.</p>
+  <figure>
+    <img src="assets/dg-iteration-cost.svg" alt="Bar comparison: 59 tethered tuning trials against 3 untethered validation runs">
+    <figcaption>The asymmetry that shaped the result.</figcaption>
+  </figure>
+  <p>The root cause of the drift itself is structural: wheel encoders measure <em>rotation</em>, not <em>position</em>. Dead reckoning integrates error and has no way to notice the vehicle has left the course. Any amount of PID tuning improves the constant; none of it closes that gap.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Change</th><th>What it addresses</th></tr></thead>
+      <tbody>
+        <tr><td>Retune the integral term</td><td>Drift accumulated across the course rather than appearing at once</td></tr>
+        <tr><td>Add a camera and image processing</td><td>Gives an absolute position reference so the vehicle can detect that it has left the track</td></tr>
+        <tr><td>Use the on-board Wi-Fi for telemetry</td><td>The radio went unused. Untethered trials would become as cheap as tethered ones — which is the actual bottleneck</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The third row is where the follow-on work went: the verification stages are now a build that runs on every change. <a href="pipeline.html">That is the pipeline page →</a></p>
+</section>
+
+<footer>
+  <p>Solo project, requirements through hardware. Figures marked as redrawn are re-rendered from the original measurement data; screenshots of the modelling environment and photographs are reproduced unchanged as evidence. Trial results are shown as recorded, including the runs that failed.</p>
+</footer>
+
+</div>

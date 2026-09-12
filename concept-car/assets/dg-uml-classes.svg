@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1030 700" width="1030" height="700" role="img" aria-label="UML class diagram of the Arduino library: DistanceReading, DistanceSensor, Encoder, SensorManager, ActuatorManager and DCMotor, with the Sensor1 interface">
+<style>
+  /* Burgundy + gold, taken verbatim from site/style.css, which in turn follows
+     brand/README.md. Light mode leads with the wine red; dark mode leads with
+     the gold, because a #5A1322 line is invisible on a near-black field - the
+     same split the avatar uses. */
+  .bg    { fill: #fbf8f7; }                                    /* --bg */
+  .panel { fill: #ffffff; stroke: #e6dcdd; stroke-width: 1.5; }   /* --panel / --line */
+  .band  { fill: #f4efee; }                                    /* --accent-soft */
+  .edge  { stroke: #8a7d80; stroke-width: 1.5; fill: none; }   /* --ink-3 */
+  .dash  { stroke: #8a7d80; stroke-width: 1.3; fill: none; stroke-dasharray: 6 4; }
+  .t     { fill: #1a1214; font-family: ui-sans-serif, system-ui, "Segoe UI", Inter, sans-serif; }
+  .m     { fill: #55494c; font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace; }
+  .dim   { fill: #8a7d80; font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace; }
+  .acc   { fill: #5A1322; }                                    /* --accent */
+  .accs  { stroke: #5A1322; }
+  .ok    { fill: #2f6f4e; }
+  .ser1  { stroke: #5A1322; }                                  /* primary series */
+  .ser2  { stroke: #8a6718; }                                  /* gold, darkened for cream */
+  .grid  { stroke: #e6dcdd; }
+  .axis  { stroke: #8a7d80; stroke-width: 1.4; }
+  @media (prefers-color-scheme: dark) {
+    .bg    { fill: #120A10; }
+    .panel { fill: #1d151a; stroke: #33232a; }
+    .band  { fill: #3C0B16; }
+    .edge, .dash { stroke: #8a7d82; }
+    .t     { fill: #F4EFEE; }
+    .m     { fill: #b9aeb1; }
+    .dim   { fill: #8a7d82; }
+    .acc   { fill: #C9A24A; }
+    .accs  { stroke: #C9A24A; }
+    .ok    { fill: #74c49a; }
+    .ser1  { stroke: #C9A24A; }
+    .ser2  { stroke: #d98a80; }
+    .grid  { stroke: #33232a; }
+    .axis  { stroke: #8a7d82; }
+  }
+</style>
+<rect class="bg" width="1030" height="700"/><text x="30" y="34" class="t" font-size="16" text-anchor="start" font-weight="600">Arduino library — class structure</text><text x="30" y="54" class="dim" font-size="11" text-anchor="start" font-weight="normal">Vendor library as supplied. I consumed this surface rather than modifying it.</text><rect class="panel" x="300" y="96" width="250" height="80" rx="6"/><rect class="band" x="301" y="97" width="248" height="31" rx="5"/><circle cx="318" cy="112" r="8" fill="none" class="accs" stroke-width="1.6"/><text x="318" y="116" class="acc" font-size="10" text-anchor="middle" font-weight="bold">C</text><text x="334" y="117" class="t" font-size="13" text-anchor="start" font-weight="600">DistanceReading</text><line class="edge" x1="300" y1="128" x2="550" y2="128"/><text x="314" y="146" class="m" font-size="11" text-anchor="start" font-weight="normal">+distance: float</text><text x="314" y="164" class="m" font-size="11" text-anchor="start" font-weight="normal">+readingStatus: int</text><rect class="panel" x="120" y="250" width="470" height="80" rx="6"/><rect class="band" x="121" y="251" width="468" height="31" rx="5"/><circle cx="138" cy="266" r="8" fill="none" class="accs" stroke-width="1.6"/><text x="138" y="270" class="acc" font-size="10" text-anchor="middle" font-weight="bold">C</text><text x="154" y="271" class="t" font-size="13" text-anchor="start" font-weight="600">DistanceSensor</text><line class="edge" x1="120" y1="282" x2="590" y2="282"/><text x="134" y="300" class="m" font-size="11" text-anchor="start" font-weight="normal">+DistanceSensor(id, mgr, range, bitsOfResolution)</text><text x="134" y="318" class="m" font-size="11" text-anchor="start" font-weight="normal">+measuredDistance(): DistanceReading</text><rect class="panel" x="660" y="250" width="330" height="98" rx="6"/><rect class="band" x="661" y="251" width="328" height="31" rx="5"/><circle cx="678" cy="266" r="8" fill="none" class="accs" stroke-width="1.6"/><text x="678" y="270" class="acc" font-size="10" text-anchor="middle" font-weight="bold">C</text><text x="694" y="271" class="t" font-size="13" text-anchor="start" font-weight="600">Encoder</text><line class="edge" x1="660" y1="282" x2="990" y2="282"/><text x="674" y="300" class="m" font-size="11" text-anchor="start" font-weight="normal">+Encoder(id, mgr, ppr: float)</text><text x="674" y="318" class="m" font-size="11" text-anchor="start" font-weight="normal">+getCounts(): T</text><text x="674" y="336" class="m" font-size="11" text-anchor="start" font-weight="normal">+reset()</text><rect class="panel" x="40" y="430" width="290" height="170" rx="6"/><rect class="band" x="41" y="431" width="288" height="31" rx="5"/><circle cx="58" cy="446" r="8" fill="none" class="accs" stroke-width="1.6"/><text x="58" y="450" class="acc" font-size="10" text-anchor="middle" font-weight="bold">C</text><text x="74" y="451" class="t" font-size="13" text-anchor="start" font-weight="600">SensorManager</text><line class="edge" x1="40" y1="462" x2="330" y2="462"/><text x="54" y="480" class="m" font-size="11" text-anchor="start" font-weight="normal">+updateSensors()</text><text x="54" y="498" class="m" font-size="11" text-anchor="start" font-weight="normal">+addSensor(Sensor1)</text><text x="54" y="516" class="m" font-size="11" text-anchor="start" font-weight="normal">+requestStart()</text><text x="54" y="534" class="m" font-size="11" text-anchor="start" font-weight="normal">+requestStop()</text><text x="54" y="552" class="m" font-size="11" text-anchor="start" font-weight="normal">+requestEnableSensors()</text><text x="54" y="570" class="m" font-size="11" text-anchor="start" font-weight="normal">+requestDisableSensors()</text><text x="54" y="588" class="m" font-size="11" text-anchor="start" font-weight="normal">+SensorManager(Serial)</text><rect class="panel" x="370" y="430" width="250" height="62" rx="6"/><rect class="band" x="371" y="431" width="248" height="31" rx="5"/><circle cx="388" cy="446" r="8" fill="none" class="accs" stroke-width="1.6"/><text x="388" y="450" class="acc" font-size="10" text-anchor="middle" font-weight="bold">C</text><text x="404" y="451" class="t" font-size="13" text-anchor="start" font-weight="600">ActuatorManager</text><line class="edge" x1="370" y1="462" x2="620" y2="462"/><text x="384" y="480" class="m" font-size="11" text-anchor="start" font-weight="normal">+ActuatorManager(Serial)</text><rect class="panel" x="700" y="430" width="290" height="80" rx="6"/><rect class="band" x="701" y="431" width="288" height="31" rx="5"/><circle cx="718" cy="446" r="8" fill="none" class="accs" stroke-width="1.6"/><text x="718" y="450" class="acc" font-size="10" text-anchor="middle" font-weight="bold">C</text><text x="734" y="451" class="t" font-size="13" text-anchor="start" font-weight="600">DCMotor</text><line class="edge" x1="700" y1="462" x2="990" y2="462"/><text x="714" y="480" class="m" font-size="11" text-anchor="start" font-weight="normal">+DCMotor(id, mgr: ActuatorManager)</text><text x="714" y="498" class="m" font-size="11" text-anchor="start" font-weight="normal">+setVoltage(int16_t)</text><circle cx="620" cy="150" r="9" class="panel"/><text x="620" y="132" class="dim" font-size="11" text-anchor="middle" font-weight="normal">«interface» Sensor1</text><path class="edge" d="M 612,157 L 470,250"/><path class="edge" d="M 629,157 L 760,250"/><path class="edge" d="M 400,192 L 360,250"/><path class="edge" d="M 250,322 L 190,430"/><path class="edge" d="M 400,322 L 470,430"/><path class="edge" d="M 830,322 L 840,430"/><text x="30" y="668" class="dim" font-size="11" text-anchor="start" font-weight="normal">T — encoder count type, templated in the library header</text></svg>

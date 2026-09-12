@@ -1,0 +1,350 @@
+:root {
+  --bg: #fbf8f7;
+  --panel: #ffffff;
+  --ink: #1a1214;
+  --ink-2: #55494c;
+  --ink-3: #8a7d80;
+  --line: #e6dcdd;
+  --accent: #5A1322;
+  --accent-soft: #f4efee;
+  --ok: #2f6f4e;
+  --fail: #8c2018;
+  --code-bg: #f6f1f0;
+  --code-ink: #33292b;
+  --tok-key: #7a3a6a;
+  --tok-str: #2f6f4e;
+  --tok-com: #94888a;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, sans-serif;
+  --serif: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #120A10; --panel: #1d151a; --ink: #F4EFEE; --ink-2: #b9aeb1;
+    --ink-3: #8a7d82; --line: #33232a; --accent: #C9A24A; --accent-soft: #3C0B16;
+    --ok: #74c49a; --fail: #d98a80; --code-bg: #1a1016; --code-ink: #ddd2d4;
+    --tok-key: #d7a8cf; --tok-str: #8fd4ae; --tok-com: #6f6469;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #120A10; --panel: #1d151a; --ink: #F4EFEE; --ink-2: #b9aeb1;
+  --ink-3: #8a7d82; --line: #33232a; --accent: #C9A24A; --accent-soft: #3C0B16;
+  --ok: #74c49a; --fail: #d98a80; --code-bg: #1a1016; --code-ink: #ddd2d4;
+  --tok-key: #d7a8cf; --tok-str: #8fd4ae; --tok-com: #6f6469;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: 16px; line-height: 1.65; margin: 0; -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- draft banner ---------- */
+.draft {
+  background: var(--accent); color: #fff; font-size: 12.5px; letter-spacing: .06em;
+  text-transform: uppercase; font-weight: 600; text-align: center; padding: 9px 16px;
+}
+
+/* ---------- top nav tabs ---------- */
+.topnav { border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 20; }
+.topnav .wrap { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; padding-top: 0; padding-bottom: 0; }
+.brand {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-3); margin-right: 22px; padding: 14px 0;
+}
+.topnav a {
+  font-size: 14.5px; text-decoration: none; color: var(--ink-2); padding: 15px 14px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;
+}
+.topnav a:hover { color: var(--ink); }
+.topnav a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+/* ---------- hero ---------- */
+header.hero { padding: 60px 0 42px; border-bottom: 1px solid var(--line); }
+.kicker {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--accent); margin: 0 0 18px;
+}
+h1 {
+  font-family: var(--serif); font-size: clamp(29px, 5vw, 44px); line-height: 1.14;
+  letter-spacing: -.015em; margin: 0 0 18px; font-weight: 600;
+}
+.standfirst { font-size: 18.5px; color: var(--ink-2); margin: 0 0 28px; max-width: 62ch; }
+.meta {
+  display: flex; flex-wrap: wrap; gap: 6px 26px; font-size: 13.5px; color: var(--ink-3);
+  font-family: var(--mono); padding-top: 22px; border-top: 1px solid var(--line);
+}
+.meta b { color: var(--ink-2); font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; }
+.chip {
+  font-family: var(--mono); font-size: 12.5px; padding: 4px 11px; border-radius: 100px;
+  background: var(--accent-soft); color: var(--accent);
+}
+
+/* ---------- sections ---------- */
+section { padding: 52px 0; border-bottom: 1px solid var(--line); }
+section:last-of-type { border-bottom: none; }
+h2 { font-family: var(--serif); font-size: 27px; font-weight: 600; letter-spacing: -.01em; margin: 0 0 8px; }
+.sec-num {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+  color: var(--ink-3); text-transform: uppercase; margin: 0 0 12px;
+}
+h3 { font-size: 16.5px; font-weight: 650; margin: 32px 0 8px; letter-spacing: -.005em; }
+h4 { font-size: 14px; font-weight: 650; margin: 22px 0 6px; }
+p { margin: 0 0 15px; max-width: 68ch; }
+.lede { font-size: 17px; color: var(--ink-2); }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+ul, ol { margin: 0 0 15px; padding-left: 20px; max-width: 68ch; }
+li { margin-bottom: 7px; }
+.dim { font-size: 14px; color: var(--ink-3); }
+
+/* ---------- v-model ---------- */
+.vmodel {
+  display: grid; grid-template-columns: 1fr 1fr; margin: 26px 0 6px;
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+}
+.vcol { padding: 20px 22px; }
+.vcol + .vcol { border-left: 1px solid var(--line); }
+.vcol h4 {
+  margin: 0 0 14px; font-size: 12px; font-family: var(--mono); letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 500;
+}
+.vstep { display: flex; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+.vcol .vstep:first-of-type { border-top: none; }
+.vstep code { font-family: var(--mono); font-size: 11.5px; color: var(--accent); flex: 0 0 auto; padding-top: 2px; }
+
+/* ---------- tables ---------- */
+.scroll { overflow-x: auto; margin: 22px 0; border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 500; background: var(--code-bg);
+}
+tr:last-child td { border-bottom: none; }
+td code, .rid { font-family: var(--mono); font-size: 12.5px; color: var(--accent); white-space: nowrap; }
+.pass { color: var(--ok); font-weight: 600; }
+.fail { color: var(--fail); font-weight: 600; }
+
+/* ---------- figures ---------- */
+figure { margin: 26px 0; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+figcaption { font-size: 13px; color: var(--ink-3); margin-top: 10px; font-family: var(--mono); }
+.figrow { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 26px 0; }
+.figrow figure { margin: 0; }
+.figrow img { object-fit: contain; }
+
+/* ---------- callout ---------- */
+.callout {
+  background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0; padding: 20px 24px; margin: 26px 0;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout .label {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+}
+blockquote {
+  margin: 22px 0; padding: 0 0 0 20px; border-left: 2px solid var(--line);
+  font-family: var(--serif); font-size: 17px; color: var(--ink-2); font-style: italic;
+}
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px;
+  margin: 20px 0; overflow: hidden;
+}
+.code-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 9px 14px; border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.code-head .lang { color: var(--accent); }
+.code pre {
+  margin: 0; padding: 16px 18px; overflow-x: auto;
+  font-family: var(--mono); font-size: 12.7px; line-height: 1.62; color: var(--code-ink);
+}
+.code pre .k { color: var(--tok-key); }
+.code pre .s { color: var(--tok-str); }
+.code pre .c { color: var(--tok-com); font-style: italic; }
+code { font-family: var(--mono); font-size: 0.9em; }
+p code, li code, td code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+
+/* ---------- tabs ---------- */
+.tabs { margin: 26px 0; }
+.tablist { display: flex; gap: 2px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.tablist button {
+  font-family: var(--sans); font-size: 14px; color: var(--ink-2); background: none;
+  border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 10px 15px; cursor: pointer; white-space: nowrap;
+}
+.tablist button:hover { color: var(--ink); }
+.tablist button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tabpanel { padding-top: 22px; }
+.tabpanel > :first-child { margin-top: 0; }
+
+/* ---------- stage cards ---------- */
+.stage-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.stage-head .tag {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--accent);
+}
+.stage-head h3 { margin: 0; font-size: 19px; font-family: var(--serif); font-weight: 600; }
+.verdict {
+  font-family: var(--mono); font-size: 12.5px; margin: 20px 0 0;
+  padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+}
+
+/* ---------- inline svg diagrams ---------- */
+.diagram { margin: 28px 0; }
+.diagram svg { display: block; width: 100%; height: auto; }
+.diagram .d-line { stroke: var(--line); }
+.diagram .d-box { fill: var(--panel); stroke: var(--line); }
+.diagram .d-box-a { fill: var(--accent-soft); stroke: var(--accent); }
+.diagram .d-t { fill: var(--ink); font-family: var(--sans); font-size: 12px; }
+.diagram .d-t-s { fill: var(--ink-3); font-family: var(--mono); font-size: 9.5px; letter-spacing: .06em; }
+.diagram .d-t-a { fill: var(--accent); font-family: var(--mono); font-size: 10px; letter-spacing: .06em; }
+.diagram .d-arrow { stroke: var(--ink-3); fill: none; }
+
+footer { padding: 40px 0 60px; font-size: 13.5px; color: var(--ink-3); font-family: var(--mono); }
+footer p { max-width: 70ch; }
+footer a { color: var(--ink-2); }
+
+@media (max-width: 700px) {
+  .vmodel, .figrow { grid-template-columns: 1fr; }
+  .vcol + .vcol { border-left: none; border-top: 1px solid var(--line); }
+  header.hero { padding: 40px 0 30px; }
+  section { padding: 40px 0; }
+  .brand { display: none; }
+}
+
+/* --- Build status ------------------------------------------------------
+   Every CI job on this page is labelled with whether it actually runs. The
+   page describes more pipeline than currently exists, and the difference
+   has to be visible rather than implied. */
+.st {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+  border: 1px solid currentColor; flex: 0 0 auto;
+}
+.st-built { color: var(--ok); }
+.st-design { color: var(--ink-3); }
+.vstep .st { margin-left: auto; align-self: flex-start; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+          margin: 18px 0 0; font-size: 13.5px; color: var(--ink-3); }
+.legend span { display: flex; gap: 7px; align-items: center; }
+.runbox {
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  margin: 22px 0; background: var(--panel);
+}
+.runbox .runhead {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; flex-wrap: wrap;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 12.5px; color: var(--ink-2);
+  background: var(--code-bg);
+}
+.runbox .runhead b { color: var(--ok); font-weight: 600; }
+.runbox pre {
+  margin: 0; padding: 16px; overflow-x: auto;
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.65;
+  color: var(--code-ink); background: var(--panel);
+}
+
+/* ============================================================
+   Defense deck page — designed motion graphics
+   ============================================================ */
+.anim {
+  border: 1px solid var(--line); border-radius: 12px; background: var(--panel);
+  overflow: hidden; margin: 26px 0;
+}
+.anim-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  flex-wrap: wrap; padding: 11px 16px; border-bottom: 1px solid var(--line);
+  background: var(--code-bg); font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+}
+.anim-head b { color: var(--accent); font-weight: 600; }
+.anim svg { display: block; width: 100%; height: auto; }
+.anim figcaption { padding: 10px 16px 14px; font-size: 13px; color: var(--ink-3);
+                   border-top: 1px solid var(--line); }
+
+.sf-node rect { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+.sf-node text { font-family: var(--mono); font-size: 11px; fill: var(--ink-2); }
+.sf-edge { stroke: var(--line); stroke-width: 1.5; fill: none; }
+.sf-lbl  { font-family: var(--mono); font-size: 9px; fill: var(--ink-3); }
+.lit     { opacity: 0; fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+
+/* one side of the square = 3s: 1.8 move, 0.3 pause, 0.75 turn, 0.15 pause */
+@keyframes lit-move {0%,59%{opacity:1}    60%,100%{opacity:0}}
+@keyframes lit-p3   {0%,59.9%{opacity:0}  60%,69%{opacity:1}  70%,100%{opacity:0}}
+@keyframes lit-turn {0%,69.9%{opacity:0}  70%,94%{opacity:1}  95%,100%{opacity:0}}
+@keyframes lit-p2   {0%,94.9%{opacity:0}  95%,100%{opacity:1}}
+.a-move { animation: lit-move 3s steps(1,end) infinite; }
+.a-p3   { animation: lit-p3   3s steps(1,end) infinite; }
+.a-turn { animation: lit-turn 3s steps(1,end) infinite; }
+.a-p2   { animation: lit-p2   3s steps(1,end) infinite; }
+
+.code-blk { opacity: 0; }
+.code-blk text { font-family: var(--mono); font-size: 11.5px; fill: var(--ink-2); }
+.code-blk .kw { fill: var(--accent); }
+.code-blk .hd { fill: var(--ink); font-weight: 600; }
+
+.rover { offset-path: path("M 690,286 L 856,286 L 856,120 L 690,120 Z");
+         offset-rotate: 0deg; animation: travel 12s linear infinite; }
+@keyframes travel {
+  0%{offset-distance:0%}    15%{offset-distance:25%}  25%{offset-distance:25%}
+  40%{offset-distance:50%}  50%{offset-distance:50%}
+  65%{offset-distance:75%}  75%{offset-distance:75%}
+  90%{offset-distance:100%} 100%{offset-distance:100%}}
+.rover-body { transform-box: fill-box; transform-origin: center;
+              animation: heading 12s linear infinite; fill: var(--accent); }
+@keyframes heading {
+  0%,17.5%{transform:rotate(0deg)}        23.75%,42.5%{transform:rotate(-90deg)}
+  48.75%,67.5%{transform:rotate(-180deg)} 73.75%,92.5%{transform:rotate(-270deg)}
+  98.75%,100%{transform:rotate(-360deg)}}
+.trail { stroke: var(--accent); stroke-width: 2.5; fill: none; stroke-linecap: round;
+         stroke-dasharray: 664; animation: draw 12s linear infinite; }
+@keyframes draw {
+  0%{stroke-dashoffset:664}  15%{stroke-dashoffset:498} 25%{stroke-dashoffset:498}
+  40%{stroke-dashoffset:332} 50%{stroke-dashoffset:332}
+  65%{stroke-dashoffset:166} 75%{stroke-dashoffset:166}
+  90%{stroke-dashoffset:0}  100%{stroke-dashoffset:0}}
+
+/* V-model traversal */
+.v-box  { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+.v-lit  { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; opacity: 0; }
+.v-txt  { font-family: var(--mono); font-size: 10.5px; fill: var(--ink-2); }
+.v-arm  { stroke: var(--line); stroke-width: 2; fill: none; }
+.v-dot  { fill: var(--accent); r: 5;
+          offset-path: path("M 90,60 L 300,300 L 420,420 L 540,300 L 750,60");
+          animation: vtravel 11s linear infinite; }
+@keyframes vtravel { 0%{offset-distance:0%} 97%,100%{offset-distance:100%} }
+/* eight stages, 1.22s each = 11.09% of the 11s cycle. Each stage stays lit
+   for its whole slice; the per-stage animation-delay is what staggers them. */
+@keyframes vlit { 0%{opacity:1} 11%{opacity:1} 11.01%{opacity:0} 100%{opacity:0} }
+.vs { animation: vlit 11s linear infinite; }
+
+/* stage pipeline */
+.pipe-seg  { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+.pipe-lit  { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; opacity: 0;
+             animation: plit 9s linear infinite; }
+@keyframes plit { 0%,2%{opacity:0} 4%,29%{opacity:1} 31%,100%{opacity:0} }
+.pipe-txt  { font-family: var(--mono); font-size: 11px; fill: var(--ink-2); }
+.pipe-sub  { font-family: var(--mono); font-size: 9px; fill: var(--ink-3); }
+.pipe-tok  { fill: var(--accent);
+             offset-path: path("M 100,150 L 380,150 L 660,150");
+             animation: ptravel 9s linear infinite; }
+@keyframes ptravel { 0%{offset-distance:0%} 100%{offset-distance:100%} }
+
+@media (prefers-reduced-motion: reduce) {
+  .a-move,.a-p3,.a-turn,.a-p2,.code-blk,.rover,.rover-body,.trail,
+  .v-dot,.vs,.pipe-lit,.pipe-tok { animation: none !important; }
+  .a-move,.code-blk:first-of-type { opacity: 1; }
+  .trail { stroke-dashoffset: 0; }
+}
+
+.topnav .back { margin-right:.9rem; opacity:.75; }
+.topnav .back:hover { opacity:1; }

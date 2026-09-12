@@ -52,6 +52,8 @@ ul.hi li { margin:.2rem 0; }
 ul.stack { list-style:none; display:flex; flex-wrap:wrap; gap:.4rem; margin:0; padding:0; }
 ul.stack li { font-size:.75rem; color:var(--muted); border:1px solid var(--line);
                border-radius:.35rem; padding:.1rem .45rem; }
+p.writeup { margin:.9rem 0 0; font-size:.85rem; }
+p.writeup a { color:var(--accent); font-weight:600; }
 footer { color:var(--muted); font-size:.85rem; border-top:1px solid var(--line); padding-top:1.5rem; }
 a { text-decoration-thickness:1px; text-underline-offset:2px; }
 </style>
@@ -136,11 +138,11 @@ a { text-decoration-thickness:1px; text-underline-offset:2px; }
           <h3>Concept Car — autonomous driving function <span class="vis vis-private">private repo</span></h3>
           <p>Two-wheeled vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21.</p>
           <ul class="hi"><li>Motor characterised by measured sweep, dead band included, rather than datasheet values</li><li>Route as a state machine with relative targets, so one four-state cycle closes any polygon</li><li>Verification retrofitted as CI: static analysis plus a requirements traceability gate</li></ul>
-          <ul class="stack"><li>Simulink</li><li>Stateflow</li><li>MATLAB</li><li>Embedded C</li><li>PID</li><li>Jenkins</li></ul>
+          <ul class="stack"><li>Simulink</li><li>Stateflow</li><li>MATLAB</li><li>Embedded C</li><li>PID</li><li>Jenkins</li></ul><p class="writeup"><a href="concept-car/concept-car.html">Read the write-up &rarr;</a></p>
         </article></div>
       </section></main>
   <footer>
-    <p>Generated 2026-09-12 from <code>content.json</code>. Private repositories are described but not linked.</p>
+    <p>Generated 2026-09-12 from <code>content.json</code>. Private repositories are described but not linked; where a project has a write-up, it is hosted here.</p>
   </footer>
 </div>
 </body>

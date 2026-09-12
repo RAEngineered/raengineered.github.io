@@ -26,6 +26,10 @@ VISIBILITY_LABEL = {
     "planned": "planned",
 }
 
+# Where the built site is served from. Card links are relative; the profile
+# README lives on github.com and needs them absolute.
+SITE_BASE = "https://raengineered.github.io"
+
 
 def load():
     data = json.loads(CONTENT.read_text(encoding="utf-8"))
@@ -66,12 +70,18 @@ def render_html(data):
                 title = f'<a href="{e(p["repo"])}">{title}</a>'
             stack = "".join(f"<li>{e(s)}</li>" for s in p.get("stack", []))
             hi = "".join(f"<li>{e(h)}</li>" for h in p.get("highlights", []))
+            # A hosted write-up is separate from the repo: a private project can
+            # still publish its pages here, so link the two independently.
+            writeup = (
+                f'<p class="writeup"><a href="{e(p["site"])}">Read the write-up &rarr;</a></p>'
+                if p.get("site") else ""
+            )
             rows.append(f"""
         <article class="card">
           <h3>{title} <span class="vis vis-{e(p.get('visibility','private'))}">{e(vis)}</span></h3>
           <p>{e(p.get("blurb",""))}</p>
           <ul class="hi">{hi}</ul>
-          <ul class="stack">{stack}</ul>
+          <ul class="stack">{stack}</ul>{writeup}
         </article>""")
         cards.append(f"""
       <section class="area">
@@ -140,6 +150,8 @@ ul.hi li {{ margin:.2rem 0; }}
 ul.stack {{ list-style:none; display:flex; flex-wrap:wrap; gap:.4rem; margin:0; padding:0; }}
 ul.stack li {{ font-size:.75rem; color:var(--muted); border:1px solid var(--line);
                border-radius:.35rem; padding:.1rem .45rem; }}
+p.writeup {{ margin:.9rem 0 0; font-size:.85rem; }}
+p.writeup a {{ color:var(--accent); font-weight:600; }}
 footer {{ color:var(--muted); font-size:.85rem; border-top:1px solid var(--line); padding-top:1.5rem; }}
 a {{ text-decoration-thickness:1px; text-underline-offset:2px; }}
 </style>
@@ -157,7 +169,7 @@ a {{ text-decoration-thickness:1px; text-underline-offset:2px; }}
   <hr>
   <main>{"".join(cards)}</main>
   <footer>
-    <p>Generated {built} from <code>content.json</code>. Private repositories are described but not linked.</p>
+    <p>Generated {built} from <code>content.json</code>. Private repositories are described but not linked; where a project has a write-up, it is hosted here.</p>
   </footer>
 </div>
 </body>
@@ -181,7 +193,10 @@ def render_readme(data):
         for p in items:
             name = f"**[{p['title']}]({p['repo']})**" if p.get("repo") else f"**{p['title']}**"
             tag = "" if p.get("repo") else f" _({p.get('visibility', 'private')})_"
-            L.append(f"- {name}{tag} — {p['blurb']}")
+            # Relative site paths only resolve on the Pages domain, so the README
+            # needs them absolute.
+            writeup = f" — [write-up]({SITE_BASE}/{p['site']})" if p.get("site") else ""
+            L.append(f"- {name}{tag} — {p['blurb']}{writeup}")
         L.append("")
     L += [
         "---",

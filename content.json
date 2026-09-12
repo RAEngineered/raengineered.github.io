@@ -58,6 +58,7 @@
         "Route as a state machine with relative targets, so one four-state cycle closes any polygon",
         "Verification retrofitted as CI: static analysis plus a requirements traceability gate"
       ],
+      "site": "concept-car/concept-car.html",
       "repo": null,
       "visibility": "private",
       "publish": true
