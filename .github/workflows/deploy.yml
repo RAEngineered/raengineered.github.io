@@ -36,6 +36,18 @@ jobs:
           mkdir -p _site
           cp index.html _site/
           if [ -d assets ]; then cp -r assets _site/; fi
+          # Project write-ups hosted on this domain. Each is a directory of
+          # static pages; add new ones here or they will not be deployed.
+          for d in concept-car; do
+            if [ -d "$d" ]; then cp -r "$d" _site/; fi
+          done
+      - name: Verify staged output
+        run: |
+          test -f _site/index.html
+          test -f _site/concept-car/concept-car.html
+          test -f _site/concept-car/tabs.js
+          test -d _site/concept-car/assets
+          echo "staged: $(find _site -type f | wc -l) files"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
