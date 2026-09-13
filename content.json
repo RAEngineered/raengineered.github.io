@@ -2,9 +2,9 @@
   "profile": {
     "name": "Rae",
     "handle": "RAEngineered",
-    "tagline": "Electric vehicle & embedded systems engineer",
+    "tagline": "Electrified vehicle & embedded systems engineer",
     "location": "Los Angeles, CA",
-    "blurb": "EV powertrain and control systems — motor control, battery/BMS, CAN/HIL test — plus the automation tooling around them. I don't work on pure ICE.",
+    "blurb": "EV, PHEV, and FCEV powertrain and control systems — motor control, battery/BMS, CAN/HIL test — plus the automation tooling around them.",
     "links": [
       {
         "label": "GitHub",
@@ -34,8 +34,8 @@
       "blurb": "Machine fleet, sync, and document pipelines."
     },
     "AUTO": {
-      "name": "Electric Vehicles",
-      "blurb": "EV powertrain, motor control, CAN, and HIL. No ICE work."
+      "name": "Electrified Vehicles",
+      "blurb": "EV, PHEV, and FCEV powertrain, motor control, CAN, and HIL."
     }
   },
   "projects": [

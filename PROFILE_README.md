@@ -1,6 +1,6 @@
-## Rae — Electric vehicle & embedded systems engineer
+## Rae — Electrified vehicle & embedded systems engineer
 
-EV powertrain and control systems — motor control, battery/BMS, CAN/HIL test — plus the automation tooling around them. I don't work on pure ICE.
+EV, PHEV, and FCEV powertrain and control systems — motor control, battery/BMS, CAN/HIL test — plus the automation tooling around them.
 
 📍 Los Angeles, CA
 
@@ -21,7 +21,7 @@ EV powertrain and control systems — motor control, battery/BMS, CAN/HIL test �
 - **Document scan pipeline** _(private)_ — Batch pipeline that separates, deskews, OCRs, classifies and renames scanned engineering records, writing structured metadata back to the filesystem.
 - **Tower-TrackStack** _(private)_ — Passive daily engineering log. Aggregates session, git and shell activity into a committed markdown record.
 
-### Electric Vehicles
+### Electrified Vehicles
 
 - **cansig** _(planned)_ — DBC-driven CAN frame decoding — C library plus a C++20 CLI. Planned.
 
