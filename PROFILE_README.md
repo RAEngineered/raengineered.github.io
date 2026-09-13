@@ -1,8 +1,12 @@
-## Rae — Automotive & embedded systems engineer
+## Rae — Electric vehicle & embedded systems engineer
 
-Vehicle systems, CAN/HIL test, and the tooling around them. I build the automation that makes the engineering work repeatable.
+EV powertrain and control systems — motor control, battery/BMS, CAN/HIL test — plus the automation tooling around them. I don't work on pure ICE.
 
 📍 Los Angeles, CA
+
+### Model-Based Design
+
+- **Concept Car — autonomous driving function** _(private)_ — Two-wheeled electric vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21. — [write-up](https://raengineered.github.io/concept-car/concept-car.html)
 
 ### Agent Harness
 
@@ -17,14 +21,10 @@ Vehicle systems, CAN/HIL test, and the tooling around them. I build the automati
 - **Document scan pipeline** _(private)_ — Batch pipeline that separates, deskews, OCRs, classifies and renames scanned engineering records, writing structured metadata back to the filesystem.
 - **Tower-TrackStack** _(private)_ — Passive daily engineering log. Aggregates session, git and shell activity into a committed markdown record.
 
-### Automotive
+### Electric Vehicles
 
 - **cansig** _(planned)_ — DBC-driven CAN frame decoding — C library plus a C++20 CLI. Planned.
 
-### Model-Based Design
-
-- **Concept Car — autonomous driving function** _(private)_ — Two-wheeled vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21. — [write-up](https://raengineered.github.io/concept-car/concept-car.html)
-
 ---
 
-<sub>Generated from <a href="https://github.com/RAEngineered/raengineered.github.io">raengineered.github.io</a> · 2026-09-12</sub>
+<sub>Generated from <a href="https://github.com/RAEngineered/raengineered.github.io">raengineered.github.io</a> · 2026-09-13</sub>

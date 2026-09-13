@@ -60,8 +60,10 @@ def render_html(data):
     prof = data["profile"]
     built = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
+    tabs = []
     cards = []
-    for key, area, items in grouped(data):
+    for i, (key, area, items) in enumerate(grouped(data)):
+        active = i == 0
         rows = []
         for p in items:
             vis = VISIBILITY_LABEL.get(p.get("visibility", "private"), "private repo")
@@ -83,8 +85,15 @@ def render_html(data):
           <ul class="hi">{hi}</ul>
           <ul class="stack">{stack}</ul>{writeup}
         </article>""")
+        tabs.append(
+            f'<button type="button" class="tab{" active" if active else ""}" '
+            f'id="tabbtn-{e(key)}" data-tab="{e(key)}" role="tab" '
+            f'aria-selected="{"true" if active else "false"}" '
+            f'aria-controls="tab-{e(key)}">{e(area["name"])}</button>'
+        )
         cards.append(f"""
-      <section class="area">
+      <section class="area{" active" if active else ""}" id="tab-{e(key)}" role="tabpanel"
+               aria-labelledby="tabbtn-{e(key)}"{"" if active else " hidden"}>
         <header class="area-head">
           <h2>{e(area["name"])}</h2>
           <p>{e(area.get("blurb",""))}</p>
@@ -133,9 +142,18 @@ h1::after {{ content:""; display:block; width:2.5rem; height:3px; background:var
 .lede {{ font-size:1.1rem; max-width:42rem; margin:0 0 1.5rem; }}
 .links a {{ color:var(--fg); }}
 hr {{ border:0; border-top:1px solid var(--line); margin:3rem 0; }}
+.tabs {{ display:flex; flex-wrap:wrap; gap:.5rem; margin:0 0 2rem; }}
+.tabs .tab {{
+  font:inherit; font-size:.85rem; font-weight:500; color:var(--muted);
+  background:transparent; border:1px solid var(--line); border-radius:2rem;
+  padding:.4rem 1rem; cursor:pointer;
+}}
+.tabs .tab:hover {{ color:var(--fg); border-color:var(--accent); }}
+.tabs .tab.active {{ color:var(--bg); background:var(--accent); border-color:var(--accent); }}
 .area-head h2 {{ font-size:1.35rem; margin:0 0 .2rem; letter-spacing:-.01em; color:var(--accent); }}
 .area-head p {{ color:var(--muted); margin:0 0 1.25rem; font-size:.95rem; }}
 .area {{ margin-bottom:3rem; }}
+.area[hidden] {{ display:none; }}
 .grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(19rem,1fr)); }}
 .card {{ background:var(--card); border:1px solid var(--line); border-radius:.75rem; padding:1.25rem; }}
 .card h3 {{ margin:0 0 .5rem; font-size:1.05rem; }}
@@ -167,11 +185,31 @@ a {{ text-decoration-thickness:1px; text-underline-offset:2px; }}
     <p class="links">{links}</p>
   </header>
   <hr>
+  <nav class="tabs" role="tablist">{"".join(tabs)}</nav>
   <main>{"".join(cards)}</main>
   <footer>
     <p>Generated {built} from <code>content.json</code>. Private repositories are described but not linked; where a project has a write-up, it is hosted here.</p>
   </footer>
 </div>
+<script>
+document.querySelectorAll(".tabs .tab").forEach(function(btn) {{
+  btn.addEventListener("click", function() {{
+    document.querySelectorAll(".tabs .tab").forEach(function(b) {{
+      b.classList.remove("active");
+      b.setAttribute("aria-selected", "false");
+    }});
+    document.querySelectorAll("main .area").forEach(function(s) {{
+      s.classList.remove("active");
+      s.hidden = true;
+    }});
+    btn.classList.add("active");
+    btn.setAttribute("aria-selected", "true");
+    var panel = document.getElementById("tab-" + btn.dataset.tab);
+    panel.hidden = false;
+    panel.classList.add("active");
+  }});
+}});
+</script>
 </body>
 </html>
 """

@@ -2,9 +2,9 @@
   "profile": {
     "name": "Rae",
     "handle": "RAEngineered",
-    "tagline": "Automotive & embedded systems engineer",
+    "tagline": "Electric vehicle & embedded systems engineer",
     "location": "Los Angeles, CA",
-    "blurb": "Vehicle systems, CAN/HIL test, and the tooling around them. I build the automation that makes the engineering work repeatable.",
+    "blurb": "EV powertrain and control systems — motor control, battery/BMS, CAN/HIL test — plus the automation tooling around them. I don't work on pure ICE.",
     "links": [
       {
         "label": "GitHub",
@@ -13,6 +13,10 @@
     ]
   },
   "areas": {
+    "MBD": {
+      "name": "Model-Based Design",
+      "blurb": "V-model development, MiL/PiL/HiL, code generation."
+    },
     "AGENT": {
       "name": "Agent Harness",
       "blurb": "Tooling that makes AI-assisted engineering reproducible."
@@ -30,12 +34,8 @@
       "blurb": "Machine fleet, sync, and document pipelines."
     },
     "AUTO": {
-      "name": "Automotive",
-      "blurb": "CAN, vehicle signals, HIL."
-    },
-    "MBD": {
-      "name": "Model-Based Design",
-      "blurb": "V-model development, MiL/PiL/HiL, code generation."
+      "name": "Electric Vehicles",
+      "blurb": "EV powertrain, motor control, CAN, and HIL. No ICE work."
     }
   },
   "projects": [
@@ -44,7 +44,7 @@
       "title": "Concept Car — autonomous driving function",
       "area": "MBD",
       "year": "2026",
-      "blurb": "Two-wheeled vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21.",
+      "blurb": "Two-wheeled electric vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21.",
       "stack": [
         "Simulink",
         "Stateflow",
