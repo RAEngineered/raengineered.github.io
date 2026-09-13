@@ -14,10 +14,15 @@
      kept neutral so nothing reads pink. */
   --bg:#fbfaf9; --fg:#171414; --muted:#68635f; --line:#e2dedb;
   --card:#ffffff; --accent:#45101B; --gold:#8a6718; --rule:#45101B;
+  --accent-soft:#f4efee; --code-bg:#f6f1f0;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  /* aliases so the concept-car diagrams (.embed) can use their own var names */
+  --ink:var(--fg); --ink-2:var(--muted); --ink-3:var(--muted); --panel:var(--card);
 }
 @media (prefers-color-scheme: dark) {
   :root { --bg:#120F10; --fg:#F4EFEE; --muted:#98918e; --line:#2b2527;
-           --card:#1A1517; --accent:#C9A24A; --gold:#C9A24A; --rule:#5A1322; }
+           --card:#1A1517; --accent:#C9A24A; --gold:#C9A24A; --rule:#5A1322;
+           --accent-soft:#3C0B16; --code-bg:#1a1016; }
 }
 * { box-sizing:border-box; }
 body {
@@ -65,6 +70,66 @@ p.writeup { margin:.9rem 0 0; font-size:.85rem; }
 p.writeup a { color:var(--accent); font-weight:600; }
 footer { color:var(--muted); font-size:.85rem; border-top:1px solid var(--line); padding-top:1.5rem; }
 a { text-decoration-thickness:1px; text-underline-offset:2px; }
+
+/* ---- featured project embed (ported from concept-car/style.css) ---- */
+.card.featured { grid-column:1 / -1; }
+.embed .lede { font-size:1rem; color:var(--fg); max-width:56ch; margin:.25rem 0 1.25rem; }
+.anim { border:1px solid var(--line); border-radius:.75rem; background:var(--card); overflow:hidden; margin:1.5rem 0; }
+.anim-head { display:flex; justify-content:space-between; align-items:baseline; gap:.75rem; flex-wrap:wrap;
+              padding:.65rem 1rem; border-bottom:1px solid var(--line); background:var(--code-bg);
+              font-family:var(--mono); font-size:.75rem; color:var(--muted); }
+.anim-head b { color:var(--accent); font-weight:600; }
+.anim svg { display:block; width:100%; height:auto; }
+.anim figcaption { padding:.6rem 1rem .85rem; font-size:.8rem; color:var(--muted); border-top:1px solid var(--line); }
+.sf-node rect { fill:var(--card); stroke:var(--line); stroke-width:1.5; }
+.sf-node text { font-family:var(--mono); font-size:11px; fill:var(--muted); }
+.sf-edge { stroke:var(--line); stroke-width:1.5; fill:none; }
+.sf-lbl { font-family:var(--mono); font-size:9px; fill:var(--muted); }
+.lit { opacity:0; fill:var(--accent-soft); stroke:var(--accent); stroke-width:2; }
+@keyframes lit-move {0%,59%{opacity:1} 60%,100%{opacity:0}}
+@keyframes lit-p3   {0%,59.9%{opacity:0} 60%,69%{opacity:1} 70%,100%{opacity:0}}
+@keyframes lit-turn {0%,69.9%{opacity:0} 70%,94%{opacity:1} 95%,100%{opacity:0}}
+@keyframes lit-p2   {0%,94.9%{opacity:0} 95%,100%{opacity:1}}
+.a-move { animation:lit-move 3s steps(1,end) infinite; }
+.a-p3   { animation:lit-p3 3s steps(1,end) infinite; }
+.a-turn { animation:lit-turn 3s steps(1,end) infinite; }
+.a-p2   { animation:lit-p2 3s steps(1,end) infinite; }
+.code-blk { opacity:0; }
+.code-blk text { font-family:var(--mono); font-size:11.5px; fill:var(--muted); }
+.code-blk .kw { fill:var(--accent); }
+.code-blk .hd { fill:var(--fg); font-weight:600; }
+.rover { offset-path:path("M 690,286 L 856,286 L 856,120 L 690,120 Z"); offset-rotate:0deg;
+          animation:travel 12s linear infinite; }
+@keyframes travel {
+  0%{offset-distance:0%} 15%{offset-distance:25%} 25%{offset-distance:25%}
+  40%{offset-distance:50%} 50%{offset-distance:50%}
+  65%{offset-distance:75%} 75%{offset-distance:75%}
+  90%{offset-distance:100%} 100%{offset-distance:100%}}
+.rover-body { transform-box:fill-box; transform-origin:center; animation:heading 12s linear infinite; fill:var(--accent); }
+@keyframes heading {
+  0%,17.5%{transform:rotate(0deg)} 23.75%,42.5%{transform:rotate(-90deg)}
+  48.75%,67.5%{transform:rotate(-180deg)} 73.75%,92.5%{transform:rotate(-270deg)}
+  98.75%,100%{transform:rotate(-360deg)}}
+.trail { stroke:var(--accent); stroke-width:2.5; fill:none; stroke-linecap:round;
+          stroke-dasharray:664; animation:draw 12s linear infinite; }
+@keyframes draw {
+  0%{stroke-dashoffset:664} 15%{stroke-dashoffset:498} 25%{stroke-dashoffset:498}
+  40%{stroke-dashoffset:332} 50%{stroke-dashoffset:332}
+  65%{stroke-dashoffset:166} 75%{stroke-dashoffset:166}
+  90%{stroke-dashoffset:0} 100%{stroke-dashoffset:0}}
+.pipe-seg { fill:var(--card); stroke:var(--line); stroke-width:1.5; }
+.pipe-lit { fill:var(--accent-soft); stroke:var(--accent); stroke-width:2; opacity:0; animation:plit 9s linear infinite; }
+@keyframes plit { 0%,2%{opacity:0} 4%,29%{opacity:1} 31%,100%{opacity:0} }
+.pipe-txt { font-family:var(--mono); font-size:11px; fill:var(--muted); }
+.pipe-sub { font-family:var(--mono); font-size:9px; fill:var(--muted); }
+.pipe-tok { fill:var(--accent); offset-path:path("M 100,150 L 380,150 L 660,150"); animation:ptravel 9s linear infinite; }
+@keyframes ptravel { 0%{offset-distance:0%} 100%{offset-distance:100%} }
+.v-arm { stroke:var(--line); stroke-width:2; fill:none; }
+@media (prefers-reduced-motion: reduce) {
+  .a-move,.a-p3,.a-turn,.a-p2,.code-blk,.rover,.rover-body,.trail,.pipe-lit,.pipe-tok { animation:none !important; }
+  .a-move,.code-blk:first-of-type { opacity:1; }
+  .trail { stroke-dashoffset:0; }
+}
 </style>
 </head>
 <body>
@@ -87,11 +152,132 @@ a { text-decoration-thickness:1px; text-underline-offset:2px; }
           <p>V-model development, MiL/PiL/HiL, code generation.</p>
         </header>
         <div class="grid">
-        <article class="card">
+        <article class="card featured">
           <h3>Concept Car — autonomous driving function <span class="vis vis-private">private repo</span></h3>
           <p>Two-wheeled electric vehicle that drives a closed course untethered. Plant model and control law developed in Simulink, sequencing as a Stateflow chart, deployed as generated embedded C on a SAMD21.</p>
           <ul class="hi"><li>Motor characterised by measured sweep, dead band included, rather than datasheet values</li><li>Route as a state machine with relative targets, so one four-state cycle closes any polygon</li><li>Verification retrofitted as CI: static analysis plus a requirements traceability gate</li></ul>
-          <ul class="stack"><li>Simulink</li><li>Stateflow</li><li>MATLAB</li><li>Embedded C</li><li>PID</li><li>Jenkins</li></ul><p class="writeup"><a href="concept-car/concept-car.html">Read the write-up &rarr;</a></p>
+          <ul class="stack"><li>Simulink</li><li>Stateflow</li><li>MATLAB</li><li>Embedded C</li><li>PID</li><li>Jenkins</li></ul>
+          <div class="embed"><p class="lede">The route is a state machine, not a script. A Stateflow chart issues velocity and rotation commands, waits on guards computed from encoder feedback, and advances — read directly out of the model, not redrawn from memory. Verification is the same idea applied to testing: three stages, each removing one simulation, so a failure stays attributable to a layer.</p>
+
+<figure class="anim">
+  <div class="anim-head">
+    <span>square-course loop — chart, action language, and resulting path</span>
+    <span><b>animated</b> — one lap, 12 s</span>
+  </div>
+  <svg viewBox="0 0 900 330" role="img" aria-label="Three synchronised panels. Left, the state chart with the active state highlighted as it cycles through MoveForward1, Pause3, Turn1 and Pause2. Middle, the entry and during actions of whichever state is currently active. Right, the car tracing one side of the square course per cycle, stationary while paused and while turning.">
+    <defs>
+      <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="color:var(--ink-3)"/>
+      </marker>
+    </defs>
+
+    <text x="24" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">STATE CHART</text>
+    <path class="sf-edge" d="M110,58 V80"   marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M110,124 V146" marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M110,190 V212" marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M110,256 V278" marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M180,300 H236 V36 H180" marker-end="url(#ah2)"/>
+    <text class="sf-lbl" x="118" y="73">after(1,sec)</text>
+    <text class="sf-lbl" x="118" y="139">[abs(desDist-dist)&lt;0.1]</text>
+    <text class="sf-lbl" x="118" y="205">after(1,sec)</text>
+    <text class="sf-lbl" x="118" y="271">[abs(desAng-ang)&lt;0.5]</text>
+    <text class="sf-lbl" x="242" y="170">loop ×4</text>
+
+    <g class="sf-node">
+      <rect x="40" y="20" width="140" height="38" rx="7"/>
+      <rect class="lit a-p2" x="40" y="20" width="140" height="38" rx="7"/>
+      <text x="52" y="44">StopFirst1 / Pause2</text></g>
+    <g class="sf-node">
+      <rect x="40" y="86" width="140" height="38" rx="7"/>
+      <rect class="lit a-move" x="40" y="86" width="140" height="38" rx="7"/>
+      <text x="52" y="110">MoveForward1</text></g>
+    <g class="sf-node">
+      <rect x="40" y="152" width="140" height="38" rx="7"/>
+      <rect class="lit a-p3" x="40" y="152" width="140" height="38" rx="7"/>
+      <text x="52" y="176">Pause3</text></g>
+    <g class="sf-node">
+      <rect x="40" y="218" width="140" height="38" rx="7"/>
+      <rect class="lit a-turn" x="40" y="218" width="140" height="38" rx="7"/>
+      <text x="52" y="242">Turn1</text></g>
+    <g class="sf-node">
+      <rect x="40" y="284" width="140" height="34" rx="7" style="stroke-dasharray:4 3"/>
+      <text x="52" y="306" style="fill:var(--ink-3)">Stop1 · after(25,sec)</text></g>
+
+    <text x="330" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">ACTION LANGUAGE — ACTIVE STATE</text>
+    <rect x="330" y="34" width="300" height="150" rx="8" style="fill:var(--code-bg);stroke:var(--line)"/>
+    <g class="code-blk a-move">
+      <text x="346" y="58" class="hd">MoveForward1</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  desDist = dist + 30;</text>
+      <text x="346" y="124" class="kw">during, exit:</text>
+      <text x="346" y="142">  v = distCtrl(desDist,dist);</text>
+      <text x="346" y="160">  w = 0;</text></g>
+    <g class="code-blk a-p3">
+      <text x="346" y="58" class="hd">Pause3</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  v = 0;</text>
+      <text x="346" y="118">  w = 0;</text></g>
+    <g class="code-blk a-turn">
+      <text x="346" y="58" class="hd">Turn1</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  desAng = ang + 90;</text>
+      <text x="346" y="124" class="kw">during, exit:</text>
+      <text x="346" y="142">  v = 0;</text>
+      <text x="346" y="160">  w = angCtrl(desAng,ang);</text></g>
+    <g class="code-blk a-p2">
+      <text x="346" y="58" class="hd">Pause2 → StopFirst1</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  v = 0;</text>
+      <text x="346" y="118">  w = 0;</text></g>
+
+    <text x="330" y="212" class="sf-lbl">v — commanded forward velocity</text>
+    <text x="330" y="230" class="sf-lbl">w — commanded rotation rate</text>
+    <text x="330" y="248" class="sf-lbl">both feed convToWheelVel → wl, wr</text>
+    <text x="330" y="278" class="sf-lbl" style="fill:var(--ink-3)">Text is verbatim from the chart;</text>
+    <text x="330" y="294" class="sf-lbl" style="fill:var(--ink-3)">every guard is the model's own.</text>
+
+    <text x="666" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">COMMANDED COURSE</text>
+    <text x="666" y="44" class="sf-lbl">4 × (forward 30, pause, turn 90°, pause)</text>
+    <text x="666" y="62" class="sf-lbl">The loop closes because desDist and</text>
+    <text x="666" y="78" class="sf-lbl">desAng are relative, not absolute.</text>
+    <rect x="666" y="96" width="214" height="214" rx="6" style="fill:none;stroke:var(--line);stroke-dasharray:3 4"/>
+    <path class="trail" d="M 690,286 L 856,286 L 856,120 L 690,120 Z"/>
+    <g class="rover"><path class="rover-body" d="M -7,-6 L 8,0 L -7,6 L -3,0 Z"/></g>
+  </svg>
+  <figcaption>State names, entry and during actions, and guard conditions are read directly out of the Simulink model. The car is stationary during the pauses and rotates in place during the turn — <code>v = 0</code> in both.</figcaption>
+</figure>
+
+<figure class="anim">
+  <div class="anim-head">
+    <span>MiL → PiL → run-on-board</span>
+    <span><b>animated</b> — 9 s</span>
+  </div>
+  <svg viewBox="0 0 760 230" role="img" aria-label="Three stages in sequence. Model-in-the-loop runs both controller and plant in simulation. Processor-in-the-loop puts the controller on the real microcontroller while the plant stays simulated. Run-on-board puts both on the physical car. A marker passes through each stage in turn.">
+    <g><rect class="pipe-seg" x="30"  y="110" width="180" height="80" rx="9"/>
+       <rect class="pipe-lit" x="30"  y="110" width="180" height="80" rx="9" style="animation-delay:0s"/>
+       <text class="pipe-txt" x="52" y="140">Model-in-the-loop</text>
+       <text class="pipe-sub" x="52" y="160">controller: simulated</text>
+       <text class="pipe-sub" x="52" y="175">plant: simulated</text></g>
+    <g><rect class="pipe-seg" x="290" y="110" width="180" height="80" rx="9"/>
+       <rect class="pipe-lit" x="290" y="110" width="180" height="80" rx="9" style="animation-delay:3s"/>
+       <text class="pipe-txt" x="312" y="140">Processor-in-the-loop</text>
+       <text class="pipe-sub" x="312" y="160">controller: real target</text>
+       <text class="pipe-sub" x="312" y="175">plant: simulated</text></g>
+    <g><rect class="pipe-seg" x="550" y="110" width="180" height="80" rx="9"/>
+       <rect class="pipe-lit" x="550" y="110" width="180" height="80" rx="9" style="animation-delay:6s"/>
+       <text class="pipe-txt" x="572" y="140">Run-on-board</text>
+       <text class="pipe-sub" x="572" y="160">controller: real target</text>
+       <text class="pipe-sub" x="572" y="175">plant: physical car</text></g>
+    <path class="v-arm" d="M 210,150 H 290"/>
+    <path class="v-arm" d="M 470,150 H 550"/>
+    <circle class="pipe-tok" cx="0" cy="0" r="6"/>
+    <text class="sf-lbl" x="30"  y="60">Each step removes one simulation. The controller stops being a model at PiL;</text>
+    <text class="sf-lbl" x="30"  y="78">the plant stops being a model on the board. Nothing else changes between stages,</text>
+    <text class="sf-lbl" x="30"  y="96">which is what makes a failure attributable.</text>
+  </svg>
+  <figcaption>The value of the ladder is diagnostic: behaviour that survives the first two stages and fails on the third is a physical-world problem, not a control-law problem. On this build: model and processor stages passed; the untethered run left the course, a wheel-encoder dead-reckoning limit rather than a controls failure.</figcaption>
+</figure>
+</div><p class="writeup"><a href="concept-car/concept-car.html">The full write-up &rarr;</a></p>
         </article></div>
       </section>
       <section class="area" id="tab-AGENT" role="tabpanel"
@@ -106,6 +292,7 @@ a { text-decoration-thickness:1px; text-underline-offset:2px; }
           <p>13 Claude Code skills I wrote: document and scan pipelines, machine-inventory generators, session cost telemetry, and a delegating orchestrator.</p>
           <ul class="hi"><li>Scan pipeline that OCRs, classifies and renames documents with a never-delete staging gate</li><li>Cost and cache-hit dashboards built over local session telemetry</li><li>Multi-agent orchestrator with explicit human approval gates</li></ul>
           <ul class="stack"><li>Python</li><li>Bash</li><li>YAML</li></ul>
+          
         </article></div>
       </section>
       <section class="area" id="tab-MAKE" role="tabpanel"
@@ -120,6 +307,7 @@ a { text-decoration-thickness:1px; text-underline-offset:2px; }
           <p>Photo to single-colour SVG pipeline with a checkpointed review loop, output constrained to be Bambu Studio importable.</p>
           <ul class="hi"><li>Human approval gate between raster generation and vectorisation</li><li>Emboss-mesh aware output for 3D print workflows</li></ul>
           <ul class="stack"><li>Python</li><li>SVG</li><li>Pillow</li></ul>
+          
         </article></div>
       </section>
       <section class="area" id="tab-SYSOPS" role="tabpanel"
@@ -134,12 +322,14 @@ a { text-decoration-thickness:1px; text-underline-offset:2px; }
           <p>Batch pipeline that separates, deskews, OCRs, classifies and renames scanned engineering records, writing structured metadata back to the filesystem.</p>
           <ul class="hi"><li>Recovered true document dates after a drive migration destroyed file mtimes</li><li>Never-delete policy with a staged review directory</li></ul>
           <ul class="stack"><li>Python</li><li>OCR</li><li>Windows</li></ul>
+          
         </article>
         <article class="card">
           <h3>Tower-TrackStack <span class="vis vis-private">private repo</span></h3>
           <p>Passive daily engineering log. Aggregates session, git and shell activity into a committed markdown record.</p>
           <ul class="hi"><li>Zero-effort capture — runs on a schedule, commits itself</li></ul>
           <ul class="stack"><li>Python</li><li>GitHub Actions</li></ul>
+          
         </article></div>
       </section>
       <section class="area" id="tab-AUTO" role="tabpanel"
@@ -154,6 +344,7 @@ a { text-decoration-thickness:1px; text-underline-offset:2px; }
           <p>DBC-driven CAN frame decoding — C library plus a C++20 CLI. Planned.</p>
           <ul class="hi"><li>gcc / clang / MSVC matrix, ASan + UBSan, gcovr coverage gate</li><li>Same build expressed as GitHub Actions, GitLab CI and a declarative Jenkinsfile</li></ul>
           <ul class="stack"><li>C</li><li>C++20</li><li>CMake</li><li>GoogleTest</li></ul>
+          
         </article></div>
       </section></main>
   <footer>

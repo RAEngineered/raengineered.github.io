@@ -1,0 +1,120 @@
+<p class="lede">The route is a state machine, not a script. A Stateflow chart issues velocity and rotation commands, waits on guards computed from encoder feedback, and advances — read directly out of the model, not redrawn from memory. Verification is the same idea applied to testing: three stages, each removing one simulation, so a failure stays attributable to a layer.</p>
+
+<figure class="anim">
+  <div class="anim-head">
+    <span>square-course loop — chart, action language, and resulting path</span>
+    <span><b>animated</b> — one lap, 12 s</span>
+  </div>
+  <svg viewBox="0 0 900 330" role="img" aria-label="Three synchronised panels. Left, the state chart with the active state highlighted as it cycles through MoveForward1, Pause3, Turn1 and Pause2. Middle, the entry and during actions of whichever state is currently active. Right, the car tracing one side of the square course per cycle, stationary while paused and while turning.">
+    <defs>
+      <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="color:var(--ink-3)"/>
+      </marker>
+    </defs>
+
+    <text x="24" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">STATE CHART</text>
+    <path class="sf-edge" d="M110,58 V80"   marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M110,124 V146" marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M110,190 V212" marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M110,256 V278" marker-end="url(#ah2)"/>
+    <path class="sf-edge" d="M180,300 H236 V36 H180" marker-end="url(#ah2)"/>
+    <text class="sf-lbl" x="118" y="73">after(1,sec)</text>
+    <text class="sf-lbl" x="118" y="139">[abs(desDist-dist)&lt;0.1]</text>
+    <text class="sf-lbl" x="118" y="205">after(1,sec)</text>
+    <text class="sf-lbl" x="118" y="271">[abs(desAng-ang)&lt;0.5]</text>
+    <text class="sf-lbl" x="242" y="170">loop ×4</text>
+
+    <g class="sf-node">
+      <rect x="40" y="20" width="140" height="38" rx="7"/>
+      <rect class="lit a-p2" x="40" y="20" width="140" height="38" rx="7"/>
+      <text x="52" y="44">StopFirst1 / Pause2</text></g>
+    <g class="sf-node">
+      <rect x="40" y="86" width="140" height="38" rx="7"/>
+      <rect class="lit a-move" x="40" y="86" width="140" height="38" rx="7"/>
+      <text x="52" y="110">MoveForward1</text></g>
+    <g class="sf-node">
+      <rect x="40" y="152" width="140" height="38" rx="7"/>
+      <rect class="lit a-p3" x="40" y="152" width="140" height="38" rx="7"/>
+      <text x="52" y="176">Pause3</text></g>
+    <g class="sf-node">
+      <rect x="40" y="218" width="140" height="38" rx="7"/>
+      <rect class="lit a-turn" x="40" y="218" width="140" height="38" rx="7"/>
+      <text x="52" y="242">Turn1</text></g>
+    <g class="sf-node">
+      <rect x="40" y="284" width="140" height="34" rx="7" style="stroke-dasharray:4 3"/>
+      <text x="52" y="306" style="fill:var(--ink-3)">Stop1 · after(25,sec)</text></g>
+
+    <text x="330" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">ACTION LANGUAGE — ACTIVE STATE</text>
+    <rect x="330" y="34" width="300" height="150" rx="8" style="fill:var(--code-bg);stroke:var(--line)"/>
+    <g class="code-blk a-move">
+      <text x="346" y="58" class="hd">MoveForward1</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  desDist = dist + 30;</text>
+      <text x="346" y="124" class="kw">during, exit:</text>
+      <text x="346" y="142">  v = distCtrl(desDist,dist);</text>
+      <text x="346" y="160">  w = 0;</text></g>
+    <g class="code-blk a-p3">
+      <text x="346" y="58" class="hd">Pause3</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  v = 0;</text>
+      <text x="346" y="118">  w = 0;</text></g>
+    <g class="code-blk a-turn">
+      <text x="346" y="58" class="hd">Turn1</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  desAng = ang + 90;</text>
+      <text x="346" y="124" class="kw">during, exit:</text>
+      <text x="346" y="142">  v = 0;</text>
+      <text x="346" y="160">  w = angCtrl(desAng,ang);</text></g>
+    <g class="code-blk a-p2">
+      <text x="346" y="58" class="hd">Pause2 → StopFirst1</text>
+      <text x="346" y="82" class="kw">entry:</text>
+      <text x="346" y="100">  v = 0;</text>
+      <text x="346" y="118">  w = 0;</text></g>
+
+    <text x="330" y="212" class="sf-lbl">v — commanded forward velocity</text>
+    <text x="330" y="230" class="sf-lbl">w — commanded rotation rate</text>
+    <text x="330" y="248" class="sf-lbl">both feed convToWheelVel → wl, wr</text>
+    <text x="330" y="278" class="sf-lbl" style="fill:var(--ink-3)">Text is verbatim from the chart;</text>
+    <text x="330" y="294" class="sf-lbl" style="fill:var(--ink-3)">every guard is the model's own.</text>
+
+    <text x="666" y="22" class="sf-lbl" style="font-size:10px;letter-spacing:.08em">COMMANDED COURSE</text>
+    <text x="666" y="44" class="sf-lbl">4 × (forward 30, pause, turn 90°, pause)</text>
+    <text x="666" y="62" class="sf-lbl">The loop closes because desDist and</text>
+    <text x="666" y="78" class="sf-lbl">desAng are relative, not absolute.</text>
+    <rect x="666" y="96" width="214" height="214" rx="6" style="fill:none;stroke:var(--line);stroke-dasharray:3 4"/>
+    <path class="trail" d="M 690,286 L 856,286 L 856,120 L 690,120 Z"/>
+    <g class="rover"><path class="rover-body" d="M -7,-6 L 8,0 L -7,6 L -3,0 Z"/></g>
+  </svg>
+  <figcaption>State names, entry and during actions, and guard conditions are read directly out of the Simulink model. The car is stationary during the pauses and rotates in place during the turn — <code>v = 0</code> in both.</figcaption>
+</figure>
+
+<figure class="anim">
+  <div class="anim-head">
+    <span>MiL → PiL → run-on-board</span>
+    <span><b>animated</b> — 9 s</span>
+  </div>
+  <svg viewBox="0 0 760 230" role="img" aria-label="Three stages in sequence. Model-in-the-loop runs both controller and plant in simulation. Processor-in-the-loop puts the controller on the real microcontroller while the plant stays simulated. Run-on-board puts both on the physical car. A marker passes through each stage in turn.">
+    <g><rect class="pipe-seg" x="30"  y="110" width="180" height="80" rx="9"/>
+       <rect class="pipe-lit" x="30"  y="110" width="180" height="80" rx="9" style="animation-delay:0s"/>
+       <text class="pipe-txt" x="52" y="140">Model-in-the-loop</text>
+       <text class="pipe-sub" x="52" y="160">controller: simulated</text>
+       <text class="pipe-sub" x="52" y="175">plant: simulated</text></g>
+    <g><rect class="pipe-seg" x="290" y="110" width="180" height="80" rx="9"/>
+       <rect class="pipe-lit" x="290" y="110" width="180" height="80" rx="9" style="animation-delay:3s"/>
+       <text class="pipe-txt" x="312" y="140">Processor-in-the-loop</text>
+       <text class="pipe-sub" x="312" y="160">controller: real target</text>
+       <text class="pipe-sub" x="312" y="175">plant: simulated</text></g>
+    <g><rect class="pipe-seg" x="550" y="110" width="180" height="80" rx="9"/>
+       <rect class="pipe-lit" x="550" y="110" width="180" height="80" rx="9" style="animation-delay:6s"/>
+       <text class="pipe-txt" x="572" y="140">Run-on-board</text>
+       <text class="pipe-sub" x="572" y="160">controller: real target</text>
+       <text class="pipe-sub" x="572" y="175">plant: physical car</text></g>
+    <path class="v-arm" d="M 210,150 H 290"/>
+    <path class="v-arm" d="M 470,150 H 550"/>
+    <circle class="pipe-tok" cx="0" cy="0" r="6"/>
+    <text class="sf-lbl" x="30"  y="60">Each step removes one simulation. The controller stops being a model at PiL;</text>
+    <text class="sf-lbl" x="30"  y="78">the plant stops being a model on the board. Nothing else changes between stages,</text>
+    <text class="sf-lbl" x="30"  y="96">which is what makes a failure attributable.</text>
+  </svg>
+  <figcaption>The value of the ladder is diagnostic: behaviour that survives the first two stages and fails on the third is a physical-world problem, not a control-law problem. On this build: model and processor stages passed; the untethered run left the course, a wheel-encoder dead-reckoning limit rather than a controls failure.</figcaption>
+</figure>

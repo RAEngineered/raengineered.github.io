@@ -59,6 +59,7 @@
         "Verification retrofitted as CI: static analysis plus a requirements traceability gate"
       ],
       "site": "concept-car/concept-car.html",
+      "embed": "concept-car/embed.html",
       "repo": null,
       "visibility": "private",
       "publish": true
